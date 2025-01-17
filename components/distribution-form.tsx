@@ -66,7 +66,7 @@ export const DistributionForm = ({
       setParam3("1")
       return
     }
-  }, [distribution, param1, param2, param3])
+  }, [distribution])
 
   const toggleSampling = () => {
     setIsSampling((prev) => !prev)
