@@ -42,7 +42,7 @@ export const Histogram = ({ data, binCount }: HistogramProps) => {
         2
       )} to ${bin.binEnd.toFixed(2)}\nCount: ${bin.count}`,
     }))
-  }, [data])
+  }, [data, binCount])
 
   return (
     <ResponsiveContainer width="100%" height="100%">

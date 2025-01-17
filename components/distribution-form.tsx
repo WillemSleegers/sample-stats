@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select"
 import { PauseIcon, PlayIcon, RefreshCwIcon } from "lucide-react"
 import { Distribution, Parameters } from "@/lib/types"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Label } from "./ui/label"
 
 type DistributionFormProps = {
@@ -27,14 +27,46 @@ export const DistributionForm = ({
   setIsSampling,
   resetSampling,
 }: DistributionFormProps) => {
-  const [error, setError] = useState("")
   const [distribution, setDistribution] = useState<Distribution>("normal")
-  const [mean, setMean] = useState("0")
-  const [sd, setSd] = useState("1")
-  const [meanlog, setMeanlog] = useState("0")
-  const [sdlog, setSdlog] = useState("1")
-  const [min, setMin] = useState("0")
-  const [max, setMax] = useState("1")
+
+  const [param1, setParam1] = useState("0")
+  const [param2, setParam2] = useState("1")
+  const [param3, setParam3] = useState("1")
+
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    if (distribution === "normal") {
+      setParam1("0")
+      setParam2("1")
+      return
+    }
+
+    if (distribution === "lognormal") {
+      setParam1("0")
+      setParam2("1")
+      return
+    }
+
+    if (distribution === "uniform") {
+      setParam1("0")
+      setParam2("1")
+      return
+    }
+
+    if (distribution === "beta") {
+      setParam1("1")
+      setParam2("1")
+      return
+    }
+
+    if (distribution === "pert") {
+      setParam1("-1")
+      setParam2("0")
+      setParam3("1")
+      return
+    }
+  }, [distribution, param1, param2, param3])
 
   const toggleSampling = () => {
     setIsSampling((prev) => !prev)
@@ -46,29 +78,51 @@ export const DistributionForm = ({
     if (distribution === "normal") {
       setParameters({
         distribution: distribution,
-        mean: Number(mean),
-        sd: Number(sd),
+        mean: Number(param1),
+        sd: Number(param2),
       })
     } else if (distribution === "lognormal") {
       setParameters({
         distribution: distribution,
-        meanlog: Number(meanlog),
-        sdlog: Number(sdlog),
+        meanlog: Number(param1),
+        sdlog: Number(param2),
       })
     } else if (distribution === "uniform") {
-      if (min > max) {
+      if (Number(param1) > Number(param2)) {
         setError("Minimum must be smaller than maximum")
         return
       } else {
-        setError("")
         setParameters({
           distribution: distribution,
-          min: Number(min),
-          max: Number(max),
+          min: Number(param1),
+          max: Number(param2),
+        })
+      }
+    } else if (distribution === "beta") {
+      setParameters({
+        distribution: distribution,
+        alpha: Number(param1),
+        beta: Number(param2),
+      })
+    } else if (distribution === "pert") {
+      if (
+        !(Number(param1) < Number(param2) && Number(param2) < Number(param3))
+      ) {
+        setError(
+          "Minimum must be smaller than mode and mode must be smaller than maximum"
+        )
+        return
+      } else {
+        setParameters({
+          distribution: distribution,
+          min: Number(param1),
+          mode: Number(param2),
+          max: Number(param3),
         })
       }
     }
 
+    setError("")
     toggleSampling()
   }
 
@@ -93,29 +147,28 @@ export const DistributionForm = ({
             </SelectContent>
           </Select>
           <p className="text-[0.8rem] text-muted-foreground">
-            Choose the distribution you want to sample from. This will determine
-            which parameters you will need to set.
+            This will determine which parameters you will need to set.
           </p>
         </div>
 
         {distribution === "normal" && (
           <div className="flex gap-4">
             <div className="space-y-2">
-              <Label htmlFor="mean">Mean</Label>
+              <Label htmlFor="normalMean">Mean</Label>
               <Input
-                id="mean"
-                value={mean}
-                onChange={(e) => setMean(e.target.value)}
+                id="normalMean"
+                value={param1}
+                onChange={(e) => setParam1(e.target.value)}
                 type="number"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="sd">Standard Deviation</Label>
+              <Label htmlFor="normalSd">Standard Deviation</Label>
               <Input
-                id="sd"
-                value={sd}
-                onChange={(e) => setSd(e.target.value)}
+                id="normalSd"
+                value={param2}
+                onChange={(e) => setParam2(e.target.value)}
                 type="number"
                 min={0}
                 step="any"
@@ -128,21 +181,21 @@ export const DistributionForm = ({
         {distribution === "lognormal" && (
           <div className="flex gap-4 flex-wrap">
             <div className="space-y-2">
-              <Label htmlFor="meanlog">Mean (log)</Label>
+              <Label htmlFor="lognormalMeanlog">Mean (log)</Label>
               <Input
-                id="meanlog"
-                value={meanlog}
-                onChange={(event) => setMeanlog(event.target.value)}
+                id="lognormalMeanlog"
+                value={param1}
+                onChange={(event) => setParam1(event.target.value)}
                 type="number"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="sdlog">Standard Deviation (log)</Label>
+              <Label htmlFor="lognormalSdlog">Standard Deviation (log)</Label>
               <Input
-                id="sdlog"
-                value={sdlog}
-                onChange={(event) => setSdlog(event.target.value)}
+                id="lognormalSdlog"
+                value={param2}
+                onChange={(event) => setParam2(event.target.value)}
                 type="number"
                 min={0}
                 step="any"
@@ -153,33 +206,92 @@ export const DistributionForm = ({
         )}
 
         {distribution === "uniform" && (
-          <div className="space-y-2">
-            <div className="flex gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="min">Minimum</Label>
-                <Input
-                  id="min"
-                  value={min}
-                  onChange={(event) => setMin(event.target.value)}
-                  type="number"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="max">Maximum</Label>
-                <Input
-                  id="max"
-                  value={max}
-                  onChange={(event) => setMax(event.target.value)}
-                  type="number"
-                  required
-                />
-              </div>
+          <div className="flex gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="uniformMin">Minimum</Label>
+              <Input
+                id="uniformMin"
+                value={param1}
+                onChange={(event) => setParam1(event.target.value)}
+                type="number"
+                required
+              />
             </div>
-            {error.length > 0 && (
-              <div className="text-sm text-destructive">{error}</div>
-            )}
+            <div className="space-y-2">
+              <Label htmlFor="uniformMax">Maximum</Label>
+              <Input
+                id="uniformMax"
+                value={param2}
+                onChange={(event) => setParam2(event.target.value)}
+                type="number"
+                required
+              />
+            </div>
           </div>
+        )}
+
+        {distribution === "beta" && (
+          <div className="flex gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="betaAlpha">Alpha</Label>
+              <Input
+                id="betaAlpha"
+                value={param1}
+                onChange={(event) => setParam1(event.target.value)}
+                type="number"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="betaBeta">Beta</Label>
+              <Input
+                id="betaBeta"
+                value={param2}
+                onChange={(event) => setParam2(event.target.value)}
+                type="number"
+                required
+              />
+            </div>
+          </div>
+        )}
+
+        {distribution === "pert" && (
+          <div className="flex gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="pertMin">Min</Label>
+              <Input
+                id="pertMin"
+                value={param1}
+                onChange={(event) => setParam1(event.target.value)}
+                type="number"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="pertMode">Mode</Label>
+              <Input
+                id="pertMode"
+                value={param2}
+                onChange={(event) => setParam2(event.target.value)}
+                type="number"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="pertMax">Max</Label>
+              <Input
+                id="pertMax"
+                value={param3}
+                onChange={(event) => setParam3(event.target.value)}
+                type="number"
+                required
+              />
+            </div>
+          </div>
+        )}
+
+        {error.length > 0 && (
+          <div className="text-sm text-destructive">{error}</div>
         )}
 
         <div className="flex space-x-2">
@@ -195,6 +307,7 @@ export const DistributionForm = ({
             variant="outline"
             onClick={(event) => {
               event.preventDefault()
+              setError("")
               resetSampling()
             }}
           >

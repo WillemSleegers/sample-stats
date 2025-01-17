@@ -146,7 +146,7 @@ const StatisticalSampling = () => {
           </div>
         </div>
 
-        <div className="border rounded-xl flex flex-col flex-grow justify-around p-4 gap-4">
+        <div className="border rounded-xl flex flex-col flex-grow justify-between p-4 gap-4">
           <div className="flex justify-between align-middle">
             <div className="text-sm text-muted-foreground text-center">
               Total Samples: {samples.length}
@@ -156,7 +156,7 @@ const StatisticalSampling = () => {
             </Button>
           </div>
 
-          <FullScreen handle={handle} className="h-[350px]">
+          <FullScreen handle={handle} className="h-[450px]">
             <Histogram data={samples} binCount={binCount} />
           </FullScreen>
 
