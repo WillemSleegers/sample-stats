@@ -1,4 +1,10 @@
-export type Distribution = "normal" | "uniform" | "lognormal" | "pert" | "beta"
+export type Distribution =
+  | "normal"
+  | "uniform"
+  | "lognormal"
+  | "pert"
+  | "beta"
+  | "metalog"
 
 export type Parameters =
   | {
@@ -26,4 +32,12 @@ export type Parameters =
       min: number
       mode: number
       max: number
+    }
+  | {
+      distribution: "metalog"
+      p10: number
+      p50: number
+      p90: number
+      lower?: number
+      upper?: number
     }

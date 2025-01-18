@@ -28,42 +28,67 @@ export const DistributionForm = ({
   resetSampling,
 }: DistributionFormProps) => {
   const [distribution, setDistribution] = useState<Distribution>("normal")
-
-  const [param1, setParam1] = useState("0")
-  const [param2, setParam2] = useState("1")
-  const [param3, setParam3] = useState("1")
-
+  const [params, setParams] = useState<Parameters>({
+    distribution: "normal",
+    mean: 0,
+    sd: 1,
+  })
   const [error, setError] = useState("")
 
   useEffect(() => {
     if (distribution === "normal") {
-      setParam1("0")
-      setParam2("1")
+      setParams({
+        distribution: "normal",
+        mean: 0,
+        sd: 1,
+      })
       return
     }
 
     if (distribution === "lognormal") {
-      setParam1("0")
-      setParam2("1")
+      setParams({
+        distribution: "lognormal",
+        meanlog: 0,
+        sdlog: 1,
+      })
       return
     }
 
     if (distribution === "uniform") {
-      setParam1("0")
-      setParam2("1")
+      setParams({
+        distribution: "uniform",
+        min: 0,
+        max: 1,
+      })
       return
     }
 
     if (distribution === "beta") {
-      setParam1("1")
-      setParam2("1")
+      setParams({
+        distribution: "beta",
+        alpha: 1,
+        beta: 1,
+      })
       return
     }
 
     if (distribution === "pert") {
-      setParam1("-1")
-      setParam2("0")
-      setParam3("1")
+      setParams({
+        distribution: "pert",
+        min: 5,
+        mode: 10,
+        max: 20,
+      })
+      return
+    }
+
+    if (distribution === "metalog") {
+      setParams({
+        distribution: "metalog",
+        p10: 5,
+        p50: 10,
+        p90: 20,
+      })
       return
     }
   }, [distribution])
@@ -75,51 +100,58 @@ export const DistributionForm = ({
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (distribution === "normal") {
-      setParameters({
-        distribution: distribution,
-        mean: Number(param1),
-        sd: Number(param2),
-      })
-    } else if (distribution === "lognormal") {
-      setParameters({
-        distribution: distribution,
-        meanlog: Number(param1),
-        sdlog: Number(param2),
-      })
-    } else if (distribution === "uniform") {
-      if (Number(param1) > Number(param2)) {
+    if (params.distribution === "normal") {
+      setParameters(params)
+    } else if (params.distribution === "lognormal") {
+      setParameters(params)
+    } else if (params.distribution === "uniform") {
+      if (params.min > params.max) {
         setError("Minimum must be smaller than maximum")
         return
       } else {
-        setParameters({
-          distribution: distribution,
-          min: Number(param1),
-          max: Number(param2),
-        })
+        setParameters(params)
       }
-    } else if (distribution === "beta") {
-      setParameters({
-        distribution: distribution,
-        alpha: Number(param1),
-        beta: Number(param2),
-      })
-    } else if (distribution === "pert") {
-      if (
-        !(Number(param1) < Number(param2) && Number(param2) < Number(param3))
-      ) {
+    } else if (params.distribution === "beta") {
+      setParameters(params)
+    } else if (params.distribution === "pert") {
+      if (!(params.min < params.mode && params.mode < params.max)) {
         setError(
           "Minimum must be smaller than mode and mode must be smaller than maximum"
         )
         return
       } else {
-        setParameters({
-          distribution: distribution,
-          min: Number(param1),
-          mode: Number(param2),
-          max: Number(param3),
-        })
+        setParameters(params)
       }
+    } else if (params.distribution === "metalog") {
+      if (params.p10 >= params.p50) {
+        setError(
+          "The value for the 10th percentile must be smaller than the value for the 50th percentile"
+        )
+        return
+      }
+      if (params.p90 <= params.p50) {
+        setError(
+          "The value for the 90th percentile must be larger than the value for the 50th percentile"
+        )
+        return
+      }
+      if (params.lower) {
+        if (params.lower >= params.p10) {
+          setError(
+            "Lower bound must be smaller than the value for the 10th percentile"
+          )
+          return
+        }
+      }
+      if (params.upper) {
+        if (params.upper <= params.p90) {
+          setError(
+            "Upper bound must be larger than the value for the 90th percentile"
+          )
+          return
+        }
+      }
+      setParameters(params)
     }
 
     setError("")
@@ -144,6 +176,7 @@ export const DistributionForm = ({
               <SelectItem value="uniform">Uniform</SelectItem>
               <SelectItem value="beta">Beta</SelectItem>
               <SelectItem value="pert">PERT</SelectItem>
+              <SelectItem value="metalog">Metalog</SelectItem>
             </SelectContent>
           </Select>
           <p className="text-[0.8rem] text-muted-foreground">
@@ -151,14 +184,19 @@ export const DistributionForm = ({
           </p>
         </div>
 
-        {distribution === "normal" && (
+        {params.distribution === "normal" && (
           <div className="flex gap-4">
             <div className="space-y-2">
               <Label htmlFor="normalMean">Mean</Label>
               <Input
                 id="normalMean"
-                value={param1}
-                onChange={(e) => setParam1(e.target.value)}
+                defaultValue={params.mean}
+                onChange={(e) =>
+                  setParams({
+                    ...params,
+                    mean: Number(e.target.value),
+                  })
+                }
                 type="number"
                 required
               />
@@ -167,8 +205,13 @@ export const DistributionForm = ({
               <Label htmlFor="normalSd">Standard Deviation</Label>
               <Input
                 id="normalSd"
-                value={param2}
-                onChange={(e) => setParam2(e.target.value)}
+                defaultValue={params.sd}
+                onChange={(e) =>
+                  setParams({
+                    ...params,
+                    sd: Number(e.target.value),
+                  })
+                }
                 type="number"
                 min={0}
                 step="any"
@@ -178,14 +221,19 @@ export const DistributionForm = ({
           </div>
         )}
 
-        {distribution === "lognormal" && (
+        {params.distribution === "lognormal" && (
           <div className="flex gap-4 flex-wrap">
             <div className="space-y-2">
               <Label htmlFor="lognormalMeanlog">Mean (log)</Label>
               <Input
                 id="lognormalMeanlog"
-                value={param1}
-                onChange={(event) => setParam1(event.target.value)}
+                defaultValue={params.meanlog}
+                onChange={(e) =>
+                  setParams({
+                    ...params,
+                    meanlog: Number(e.target.value),
+                  })
+                }
                 type="number"
                 required
               />
@@ -194,8 +242,13 @@ export const DistributionForm = ({
               <Label htmlFor="lognormalSdlog">Standard Deviation (log)</Label>
               <Input
                 id="lognormalSdlog"
-                value={param2}
-                onChange={(event) => setParam2(event.target.value)}
+                defaultValue={params.sdlog}
+                onChange={(e) =>
+                  setParams({
+                    ...params,
+                    sdlog: Number(e.target.value),
+                  })
+                }
                 type="number"
                 min={0}
                 step="any"
@@ -205,14 +258,19 @@ export const DistributionForm = ({
           </div>
         )}
 
-        {distribution === "uniform" && (
+        {params.distribution === "uniform" && (
           <div className="flex gap-4">
             <div className="space-y-2">
               <Label htmlFor="uniformMin">Minimum</Label>
               <Input
                 id="uniformMin"
-                value={param1}
-                onChange={(event) => setParam1(event.target.value)}
+                defaultValue={params.min}
+                onChange={(e) =>
+                  setParams({
+                    ...params,
+                    min: Number(e.target.value),
+                  })
+                }
                 type="number"
                 required
               />
@@ -221,8 +279,13 @@ export const DistributionForm = ({
               <Label htmlFor="uniformMax">Maximum</Label>
               <Input
                 id="uniformMax"
-                value={param2}
-                onChange={(event) => setParam2(event.target.value)}
+                defaultValue={params.max}
+                onChange={(e) =>
+                  setParams({
+                    ...params,
+                    max: Number(e.target.value),
+                  })
+                }
                 type="number"
                 required
               />
@@ -230,14 +293,19 @@ export const DistributionForm = ({
           </div>
         )}
 
-        {distribution === "beta" && (
+        {params.distribution === "beta" && (
           <div className="flex gap-4">
             <div className="space-y-2">
               <Label htmlFor="betaAlpha">Alpha</Label>
               <Input
                 id="betaAlpha"
-                value={param1}
-                onChange={(event) => setParam1(event.target.value)}
+                defaultValue={params.alpha}
+                onChange={(e) =>
+                  setParams({
+                    ...params,
+                    alpha: Number(e.target.value),
+                  })
+                }
                 type="number"
                 required
               />
@@ -246,8 +314,13 @@ export const DistributionForm = ({
               <Label htmlFor="betaBeta">Beta</Label>
               <Input
                 id="betaBeta"
-                value={param2}
-                onChange={(event) => setParam2(event.target.value)}
+                defaultValue={params.beta}
+                onChange={(e) =>
+                  setParams({
+                    ...params,
+                    beta: Number(e.target.value),
+                  })
+                }
                 type="number"
                 required
               />
@@ -255,14 +328,19 @@ export const DistributionForm = ({
           </div>
         )}
 
-        {distribution === "pert" && (
+        {params.distribution === "pert" && (
           <div className="flex gap-4">
             <div className="space-y-2">
               <Label htmlFor="pertMin">Min</Label>
               <Input
                 id="pertMin"
-                value={param1}
-                onChange={(event) => setParam1(event.target.value)}
+                defaultValue={params.min}
+                onChange={(e) =>
+                  setParams({
+                    ...params,
+                    min: Number(e.target.value),
+                  })
+                }
                 type="number"
                 required
               />
@@ -271,8 +349,13 @@ export const DistributionForm = ({
               <Label htmlFor="pertMode">Mode</Label>
               <Input
                 id="pertMode"
-                value={param2}
-                onChange={(event) => setParam2(event.target.value)}
+                defaultValue={params.mode}
+                onChange={(e) =>
+                  setParams({
+                    ...params,
+                    mode: Number(e.target.value),
+                  })
+                }
                 type="number"
                 required
               />
@@ -281,11 +364,96 @@ export const DistributionForm = ({
               <Label htmlFor="pertMax">Max</Label>
               <Input
                 id="pertMax"
-                value={param3}
-                onChange={(event) => setParam3(event.target.value)}
+                defaultValue={params.max}
+                onChange={(e) =>
+                  setParams({
+                    ...params,
+                    max: Number(e.target.value),
+                  })
+                }
                 type="number"
                 required
               />
+            </div>
+          </div>
+        )}
+
+        {params.distribution === "metalog" && (
+          <div className="space-y-4">
+            <div className="flex gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="metalogP10">P10</Label>
+                <Input
+                  id="metalogP10"
+                  defaultValue={params.p10}
+                  onChange={(e) =>
+                    setParams({
+                      ...params,
+                      p10: Number(e.target.value),
+                    })
+                  }
+                  type="number"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="metalogP50">P50</Label>
+                <Input
+                  id="metalogP50"
+                  defaultValue={params.p50}
+                  onChange={(e) =>
+                    setParams({
+                      ...params,
+                      p50: Number(e.target.value),
+                    })
+                  }
+                  type="number"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="metalogP90">P90</Label>
+                <Input
+                  id="metalogP90"
+                  defaultValue={params.p90}
+                  onChange={(e) =>
+                    setParams({
+                      ...params,
+                      p90: Number(e.target.value),
+                    })
+                  }
+                  type="number"
+                  required
+                />
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="metalogLower">Lower bound</Label>
+                <Input
+                  id="metalogLower"
+                  onChange={(e) =>
+                    setParams({
+                      ...params,
+                      lower: Number(e.target.value),
+                    })
+                  }
+                  type="number"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="metalogUpper">Upper bound</Label>
+                <Input
+                  id="metalogUpper"
+                  onChange={(e) =>
+                    setParams({
+                      ...params,
+                      upper: Number(e.target.value),
+                    })
+                  }
+                  type="number"
+                />
+              </div>
             </div>
           </div>
         )}

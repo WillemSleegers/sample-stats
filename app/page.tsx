@@ -37,7 +37,12 @@ const StatisticalSampling = () => {
 
   const samplingIntervalRef = useRef<ReturnType<typeof setInterval>>(null)
 
+  const [fullScreenEnabled, setFullScreenEnabled] = useState(true)
   const handle = useFullScreenHandle()
+
+  useEffect(() => {
+    setFullScreenEnabled(window.document.fullscreenEnabled)
+  }, [])
 
   const updateStats = useCallback((newSamples: number[]) => {
     if (newSamples.length === 0) return
@@ -136,7 +141,7 @@ const StatisticalSampling = () => {
             <div className="space-y-2">
               <Label htmlFor="bins">Bins</Label>
               <Input
-                value={binCount}
+                defaultValue={binCount}
                 onChange={(event) => setBinCount(Number(event.target.value))}
                 type="number"
                 min={10}
@@ -151,9 +156,11 @@ const StatisticalSampling = () => {
             <div className="text-sm text-muted-foreground text-center">
               Total Samples: {samples.length}
             </div>
-            <Button size="icon" variant="ghost" onClick={handle.enter}>
-              <FullscreenIcon />
-            </Button>
+            {fullScreenEnabled && (
+              <Button size="icon" variant="ghost" onClick={handle.enter}>
+                <FullscreenIcon />
+              </Button>
+            )}
           </div>
 
           <FullScreen handle={handle} className="h-[450px]">

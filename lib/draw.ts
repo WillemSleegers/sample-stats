@@ -5,6 +5,7 @@ import { rpert } from "@/lib/distributions/rpert"
 import { rbeta } from "@/lib/distributions/rbeta"
 
 import { Parameters } from "@/lib/types"
+import { rmetalog } from "./distributions/rmetalog"
 
 export const draw = (n: number, params: Parameters): number[] => {
   switch (params.distribution) {
@@ -18,5 +19,15 @@ export const draw = (n: number, params: Parameters): number[] => {
       return rpert(n, params.min, params.mode, params.max)
     case "beta":
       return rbeta(n, params.alpha, params.beta)
+    case "metalog":
+      return rmetalog(
+        n,
+        [
+          { p: 0.1, x: params.p10 },
+          { p: 0.5, x: params.p50 },
+          { p: 0.9, x: params.p90 },
+        ],
+        { lower: params.lower, upper: params.upper }
+      )
   }
 }
