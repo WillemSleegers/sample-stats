@@ -83,7 +83,7 @@ export function rmetalog(
     const y2 = logit
     const y3 = (u - 0.5) * logit
 
-    let s = a[0] + a[1] * y2 + a[2] * y3
+    const s = a[0] + a[1] * y2 + a[2] * y3
 
     // Transform back based on boundedness
     switch (boundedness) {
