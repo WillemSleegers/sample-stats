@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react"
 import { FullScreen, useFullScreenHandle } from "react-full-screen"
+import { FullscreenIcon } from "lucide-react"
 
 import {
   Select,
@@ -11,18 +12,21 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
 import { Histogram } from "@/components/histogram"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { DistributionForm } from "@/components/distribution-form"
 
 import { draw } from "@/lib/draw"
-import { Parameters } from "@/lib/types"
-import { SPEED_SETTINGS, SpeedSetting } from "@/lib/constants"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { FullscreenIcon } from "lucide-react"
+import { max, mean, min, quantile } from "@/lib/utils"
 
-const StatisticalSampling = () => {
+import { SPEED_SETTINGS } from "@/lib/constants"
+
+import { Parameters, SpeedSetting, Stats } from "@/lib/types"
+
+const App = () => {
   const [parameters, setParameters] = useState<Parameters>({
     distribution: "normal",
     mean: 0,
@@ -30,34 +34,46 @@ const StatisticalSampling = () => {
   })
   const [samples, setSamples] = useState<number[]>([])
   const [isSampling, setIsSampling] = useState(false)
-  const [stats, setStats] = useState({ p10: 0, p50: 0, p90: 0 })
+  const [stats, setStats] = useState<Stats>({})
 
   const [speed, setSpeed] = useState<SpeedSetting>("normal")
   const [binCount, setBinCount] = useState(20)
-
-  const samplingIntervalRef = useRef<ReturnType<typeof setInterval>>(null)
+  const [extraStats, setExtraStats] = useState(false)
 
   const [fullScreenEnabled, setFullScreenEnabled] = useState(true)
   const handle = useFullScreenHandle()
+
+  const samplingIntervalRef = useRef<ReturnType<typeof setInterval>>(null)
 
   useEffect(() => {
     setFullScreenEnabled(window.document.fullscreenEnabled)
   }, [])
 
-  const updateStats = useCallback((newSamples: number[]) => {
-    if (newSamples.length === 0) return
+  const updateStats = useCallback(
+    (newSamples: number[]) => {
+      if (newSamples.length === 0) return
 
-    const sorted = [...newSamples].sort((a, b) => a - b)
-    const p10Index = Math.floor(sorted.length * 0.1)
-    const p50Index = Math.floor(sorted.length * 0.5)
-    const p90Index = Math.floor(sorted.length * 0.9)
+      const quantiles = quantile(newSamples, [0.1, 0.5, 0.9])
 
-    setStats({
-      p10: sorted[p10Index] || 0,
-      p50: sorted[p50Index] || 0,
-      p90: sorted[p90Index] || 0,
-    })
-  }, [])
+      if (extraStats) {
+        setStats({
+          p10: quantiles[0],
+          p50: quantiles[1],
+          p90: quantiles[2],
+          min: min(newSamples),
+          max: max(newSamples),
+          mean: mean(newSamples),
+        })
+      } else {
+        setStats({
+          p10: quantiles[0],
+          p50: quantiles[1],
+          p90: quantiles[2],
+        })
+      }
+    },
+    [extraStats]
+  )
 
   const addSamples = useCallback(() => {
     const { n } = SPEED_SETTINGS[speed]
@@ -148,6 +164,16 @@ const StatisticalSampling = () => {
                 max={100}
               />
             </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="extra-stats"
+                checked={extraStats}
+                onCheckedChange={() => {
+                  setExtraStats((prev) => !prev)
+                }}
+              />
+              <Label htmlFor="extra-stats">Extra statistics</Label>
+            </div>
           </div>
         </div>
 
@@ -170,16 +196,47 @@ const StatisticalSampling = () => {
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
               <Label>10th Percentile</Label>
-              <div className="text-xl font-bold">{stats.p10.toFixed(2)}</div>
+              <div className="text-xl font-bold">
+                {stats.p10 ? stats.p10.toFixed(2) : "-"}
+              </div>
             </div>
             <div>
               <Label>50th Percentile</Label>
-              <div className="text-xl font-bold">{stats.p50.toFixed(2)}</div>
+              <div className="text-xl font-bold">
+                {stats.p50 ? stats.p50.toFixed(2) : "-"}
+              </div>
             </div>
             <div>
               <Label>90th Percentile</Label>
-              <div className="text-xl font-bold">{stats.p90.toFixed(2)}</div>
+              <div className="text-xl font-bold">
+                {stats.p90 ? stats.p90.toFixed(2) : "-"}
+              </div>
             </div>
+
+            {extraStats && (
+              <div>
+                <Label>Min</Label>
+                <div className="text-xl font-bold">
+                  {stats.min ? stats.min.toFixed(2) : "-"}
+                </div>
+              </div>
+            )}
+            {extraStats && (
+              <div>
+                <Label>Mean</Label>
+                <div className="text-xl font-bold">
+                  {stats.mean ? stats.mean.toFixed(2) : "-"}
+                </div>
+              </div>
+            )}
+            {extraStats && (
+              <div>
+                <Label>Max</Label>
+                <div className="text-xl font-bold">
+                  {stats.max ? stats.max.toFixed(2) : "-"}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -187,4 +244,4 @@ const StatisticalSampling = () => {
   )
 }
 
-export default StatisticalSampling
+export default App

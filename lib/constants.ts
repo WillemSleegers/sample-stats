@@ -4,5 +4,3 @@ export const SPEED_SETTINGS = {
   fast: { interval: 50, n: 2 },
   faster: { interval: 25, n: 4 },
 }
-
-export type SpeedSetting = keyof typeof SPEED_SETTINGS

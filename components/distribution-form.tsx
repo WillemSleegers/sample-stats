@@ -154,6 +154,8 @@ export const DistributionForm = ({
       setParameters(params)
     }
 
+    console.log(params)
+
     setError("")
     toggleSampling()
   }
@@ -435,7 +437,9 @@ export const DistributionForm = ({
                   onChange={(e) =>
                     setParams({
                       ...params,
-                      lower: Number(e.target.value),
+                      lower: e.target.value
+                        ? Number(e.target.value)
+                        : undefined,
                     })
                   }
                   type="number"
@@ -448,7 +452,9 @@ export const DistributionForm = ({
                   onChange={(e) =>
                     setParams({
                       ...params,
-                      upper: Number(e.target.value),
+                      upper: e.target.value
+                        ? Number(e.target.value)
+                        : undefined,
                     })
                   }
                   type="number"

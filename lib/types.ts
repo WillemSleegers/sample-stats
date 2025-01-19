@@ -1,3 +1,5 @@
+import { SPEED_SETTINGS } from "@/lib/constants"
+
 export type Distribution =
   | "normal"
   | "uniform"
@@ -41,3 +43,14 @@ export type Parameters =
       lower?: number
       upper?: number
     }
+
+export type Stats = {
+  p10?: number
+  p50?: number
+  p90?: number
+  min?: number
+  max?: number
+  mean?: number
+}
+
+export type SpeedSetting = keyof typeof SPEED_SETTINGS
