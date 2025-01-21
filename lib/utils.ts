@@ -5,6 +5,10 @@ export const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs))
 }
 
+export const sum = (x: number[]): number => {
+  return x.reduce((a, b) => a + b)
+}
+
 export const mean = (x: number[]): number => {
   return x.reduce((a, b) => a + b) / x.length
 }
