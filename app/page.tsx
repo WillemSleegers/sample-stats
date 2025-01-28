@@ -134,7 +134,7 @@ const App = () => {
             setIsSampling={setIsSampling}
             resetSampling={resetSampling}
           />
-          <div className="bg-card p-4 border rounded-xl flex-grow space-y-4 min-w-48">
+          <div className="bg-card p-4 border rounded-xl grow space-y-4 min-w-48">
             <div className="space-y-2">
               <Label htmlFor="speed">Speed</Label>
               <Select
@@ -143,7 +143,7 @@ const App = () => {
                 }}
                 defaultValue="normal"
               >
-                <SelectTrigger id="speed">
+                <SelectTrigger id="speed" className="mt-2">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -162,6 +162,7 @@ const App = () => {
                 type="number"
                 min={10}
                 max={100}
+                className="mt-2"
               />
             </div>
             <div className="flex items-center space-x-2">
@@ -177,7 +178,7 @@ const App = () => {
           </div>
         </div>
 
-        <div className="border rounded-xl flex flex-col flex-grow justify-between p-4 gap-4">
+        <div className="border rounded-xl flex flex-col grow justify-between p-4 gap-4">
           <div className="flex justify-between align-middle">
             <div className="text-sm text-muted-foreground text-center">
               Total Samples: {samples.length}

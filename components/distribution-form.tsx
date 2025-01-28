@@ -169,7 +169,7 @@ export const DistributionForm = ({
             value={distribution}
             onValueChange={(value: Distribution) => setDistribution(value)}
           >
-            <SelectTrigger>
+            <SelectTrigger className="mt-2">
               <SelectValue id="distribution" />
             </SelectTrigger>
             <SelectContent>
@@ -201,6 +201,7 @@ export const DistributionForm = ({
                 }
                 type="number"
                 required
+                className="mt-2"
               />
             </div>
             <div className="space-y-2">
@@ -218,6 +219,7 @@ export const DistributionForm = ({
                 min={0}
                 step="any"
                 required
+                className="mt-2"
               />
             </div>
           </div>
@@ -255,6 +257,7 @@ export const DistributionForm = ({
                 min={0}
                 step="any"
                 required
+                className="mt-2"
               />
             </div>
           </div>
@@ -275,6 +278,7 @@ export const DistributionForm = ({
                 }
                 type="number"
                 required
+                className="mt-2"
               />
             </div>
             <div className="space-y-2">
@@ -290,6 +294,7 @@ export const DistributionForm = ({
                 }
                 type="number"
                 required
+                className="mt-2"
               />
             </div>
           </div>
@@ -310,6 +315,7 @@ export const DistributionForm = ({
                 }
                 type="number"
                 required
+                className="mt-2"
               />
             </div>
             <div className="space-y-2">
@@ -325,6 +331,7 @@ export const DistributionForm = ({
                 }
                 type="number"
                 required
+                className="mt-2"
               />
             </div>
           </div>
@@ -345,6 +352,7 @@ export const DistributionForm = ({
                 }
                 type="number"
                 required
+                className="mt-2"
               />
             </div>
             <div className="space-y-2">
@@ -360,6 +368,7 @@ export const DistributionForm = ({
                 }
                 type="number"
                 required
+                className="mt-2"
               />
             </div>
             <div className="space-y-2">
@@ -375,6 +384,7 @@ export const DistributionForm = ({
                 }
                 type="number"
                 required
+                className="mt-2"
               />
             </div>
           </div>
@@ -396,6 +406,7 @@ export const DistributionForm = ({
                   }
                   type="number"
                   required
+                  className="mt-2"
                 />
               </div>
               <div className="space-y-2">
@@ -411,6 +422,7 @@ export const DistributionForm = ({
                   }
                   type="number"
                   required
+                  className="mt-2"
                 />
               </div>
               <div className="space-y-2">
@@ -426,6 +438,7 @@ export const DistributionForm = ({
                   }
                   type="number"
                   required
+                  className="mt-2"
                 />
               </div>
             </div>
@@ -443,6 +456,7 @@ export const DistributionForm = ({
                     })
                   }
                   type="number"
+                  className="mt-2"
                 />
               </div>
               <div className="space-y-2">
@@ -458,6 +472,7 @@ export const DistributionForm = ({
                     })
                   }
                   type="number"
+                  className="mt-2"
                 />
               </div>
             </div>
