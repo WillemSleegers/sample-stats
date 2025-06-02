@@ -56,3 +56,7 @@ export type Stats = {
 }
 
 export type SpeedSetting = keyof typeof SPEED_SETTINGS
+
+export type FormHandle = {
+  submitForm: () => void
+}

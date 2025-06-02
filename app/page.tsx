@@ -17,7 +17,13 @@ import { draw } from "@/lib/draw"
 
 import { DEFAULT_PARAMETERS, SPEED_SETTINGS } from "@/lib/constants"
 
-import { Distribution, Parameters, SpeedSetting, Stats } from "@/lib/types"
+import {
+  Distribution,
+  FormHandle,
+  Parameters,
+  SpeedSetting,
+  Stats,
+} from "@/lib/types"
 import { max, mean, min, quantile } from "@/lib/utils"
 import { StatisticsSummary } from "@/components/statistics"
 
@@ -37,6 +43,7 @@ const App = () => {
   const samplingIntervalRef = useRef<ReturnType<typeof setInterval>>(null)
   const statsIntervalRef = useRef<ReturnType<typeof setInterval>>(null)
   const samplesRef = useRef<number[]>([])
+  const formRef = useRef<FormHandle>(null)
 
   // Full screen
   const [fullScreenEnabled, setFullScreenEnabled] = useState(true)
@@ -61,6 +68,10 @@ const App = () => {
 
   // Event handlers
   const handleClick = () => {
+    if (formRef.current) {
+      console.log("submitting form")
+      formRef.current.submitForm()
+    }
     setIsSampling((prev) => !prev)
   }
 
@@ -129,6 +140,7 @@ const App = () => {
   return (
     <SidebarProvider defaultOpen={false}>
       <AppSidebar
+        ref={formRef}
         distribution={distribution}
         params={parameters}
         setParams={setParameters}

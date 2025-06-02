@@ -2,7 +2,12 @@
 
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { Dispatch, SetStateAction } from "react"
+import {
+  Dispatch,
+  forwardRef,
+  SetStateAction,
+  useImperativeHandle,
+} from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import {
@@ -15,9 +20,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 
-import { Parameters } from "@/lib/types"
+import { FormHandle, Parameters } from "@/lib/types"
 
 import { DEFAULT_PARAMETERS } from "@/lib/constants"
 
@@ -40,70 +44,78 @@ type FormPertDistributionProps = {
   setParams: Dispatch<SetStateAction<Parameters>>
 }
 
-const FormPertDistribution = ({ setParams }: FormPertDistributionProps) => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      min: DEFAULT_PARAMETERS.pert.min,
-      mode: DEFAULT_PARAMETERS.pert.mode,
-      max: DEFAULT_PARAMETERS.pert.max,
-    },
-  })
+const FormPertDistribution = forwardRef<FormHandle, FormPertDistributionProps>(
+  ({ setParams }, ref) => {
+    const form = useForm<z.infer<typeof formSchema>>({
+      resolver: zodResolver(formSchema),
+      defaultValues: {
+        min: DEFAULT_PARAMETERS.pert.min,
+        mode: DEFAULT_PARAMETERS.pert.mode,
+        max: DEFAULT_PARAMETERS.pert.max,
+      },
+    })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    setParams(values)
+    useImperativeHandle(ref, () => ({
+      submitForm: () => {
+        form.handleSubmit(onSubmit)()
+      },
+    }))
+
+    function onSubmit(values: z.infer<typeof formSchema>) {
+      setParams(values)
+    }
+
+    return (
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+          <FormField
+            control={form.control}
+            name="min"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Minimum</FormLabel>
+                <FormControl>
+                  <Input type="number" className="bg-background" {...field} />
+                </FormControl>
+                <FormDescription></FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="mode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mode</FormLabel>
+                <FormControl>
+                  <Input type="number" className="bg-background" {...field} />
+                </FormControl>
+                <FormDescription></FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="max"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Maximum</FormLabel>
+                <FormControl>
+                  <Input type="number" className="bg-background" {...field} />
+                </FormControl>
+                <FormDescription></FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </form>
+      </Form>
+    )
   }
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-        <FormField
-          control={form.control}
-          name="min"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Minimum</FormLabel>
-              <FormControl>
-                <Input type="number" className="bg-background" {...field} />
-              </FormControl>
-              <FormDescription></FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="mode"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mode</FormLabel>
-              <FormControl>
-                <Input type="number" className="bg-background" {...field} />
-              </FormControl>
-              <FormDescription></FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="max"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Maximum</FormLabel>
-              <FormControl>
-                <Input type="number" className="bg-background" {...field} />
-              </FormControl>
-              <FormDescription></FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" variant="outline" className="">
-          Update parameters
-        </Button>
-      </form>
-    </Form>
-  )
-}
+)
+
+FormPertDistribution.displayName = "FormPertDistribution"
 
 export default FormPertDistribution

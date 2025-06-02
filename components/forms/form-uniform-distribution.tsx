@@ -2,7 +2,12 @@
 
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { Dispatch, SetStateAction } from "react"
+import {
+  Dispatch,
+  forwardRef,
+  SetStateAction,
+  useImperativeHandle,
+} from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import {
@@ -15,9 +20,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 
-import { Parameters } from "@/lib/types"
+import { FormHandle, Parameters } from "@/lib/types"
 
 import { DEFAULT_PARAMETERS } from "@/lib/constants"
 
@@ -30,9 +34,10 @@ type FormUniformDistributionProps = {
   setParams: Dispatch<SetStateAction<Parameters>>
 }
 
-const FormUniformDistribution = ({
-  setParams,
-}: FormUniformDistributionProps) => {
+const FormUniformDistribution = forwardRef<
+  FormHandle,
+  FormUniformDistributionProps
+>(({ setParams }, ref) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,9 +46,16 @@ const FormUniformDistribution = ({
     },
   })
 
+  useImperativeHandle(ref, () => ({
+    submitForm: () => {
+      form.handleSubmit(onSubmit)()
+    },
+  }))
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     setParams(values)
   }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
@@ -75,12 +87,11 @@ const FormUniformDistribution = ({
             </FormItem>
           )}
         />
-        <Button type="submit" variant="outline" className="">
-          Update parameters
-        </Button>
       </form>
     </Form>
   )
-}
+})
 
 export default FormUniformDistribution
+
+FormUniformDistribution.displayName = "FormUniformDistribution"

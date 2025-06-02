@@ -2,7 +2,12 @@
 
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { Dispatch, SetStateAction } from "react"
+import {
+  Dispatch,
+  SetStateAction,
+  forwardRef,
+  useImperativeHandle,
+} from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import {
@@ -15,9 +20,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 
-import { Parameters } from "@/lib/types"
+import { FormHandle, Parameters } from "@/lib/types"
 
 import { DEFAULT_PARAMETERS } from "@/lib/constants"
 
@@ -30,7 +34,10 @@ type FormNormalDistributionProps = {
   setParams: Dispatch<SetStateAction<Parameters>>
 }
 
-const FormNormalDistribution = ({ setParams }: FormNormalDistributionProps) => {
+const FormNormalDistribution = forwardRef<
+  FormHandle,
+  FormNormalDistributionProps
+>(({ setParams }, ref) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,9 +46,17 @@ const FormNormalDistribution = ({ setParams }: FormNormalDistributionProps) => {
     },
   })
 
+  useImperativeHandle(ref, () => ({
+    submitForm: () => {
+      form.handleSubmit(onSubmit)()
+    },
+  }))
+
   function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values)
     setParams(values)
   }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
@@ -73,12 +88,11 @@ const FormNormalDistribution = ({ setParams }: FormNormalDistributionProps) => {
             </FormItem>
           )}
         />
-        <Button type="submit" variant="outline" className="">
-          Update parameters
-        </Button>
       </form>
     </Form>
   )
-}
+})
 
 export default FormNormalDistribution
+
+FormNormalDistribution.displayName = "FormNormalDistribution"

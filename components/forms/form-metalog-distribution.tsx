@@ -2,7 +2,12 @@
 
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { Dispatch, SetStateAction } from "react"
+import {
+  Dispatch,
+  forwardRef,
+  SetStateAction,
+  useImperativeHandle,
+} from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import {
@@ -15,9 +20,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 
-import { Parameters } from "@/lib/types"
+import { FormHandle, Parameters } from "@/lib/types"
 
 import { DEFAULT_PARAMETERS } from "@/lib/constants"
 
@@ -31,7 +35,9 @@ const formSchema = z
   })
   .refine(
     (data) => {
-      if (data.lower) return data.lower < data.p10
+      if (data.lower) {
+        return data.lower < data.p10
+      } else return true
     },
     {
       message: "The lower bound must be smaller than the 10th percentile",
@@ -48,7 +54,9 @@ const formSchema = z
   })
   .refine(
     (data) => {
-      if (data.upper) return data.p90 < data.upper
+      if (data.upper) {
+        return data.p90 < data.upper
+      } else return true
     },
     {
       message: "The 90th percentile must be smaller than the upper bound",
@@ -60,9 +68,10 @@ type FormMetalogDistributionProps = {
   setParams: Dispatch<SetStateAction<Parameters>>
 }
 
-const FormMetalogDistribution = ({
-  setParams,
-}: FormMetalogDistributionProps) => {
+const FormMetalogDistribution = forwardRef<
+  FormHandle,
+  FormMetalogDistributionProps
+>(({ setParams }, ref) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -72,9 +81,16 @@ const FormMetalogDistribution = ({
     },
   })
 
+  useImperativeHandle(ref, () => ({
+    submitForm: () => {
+      form.handleSubmit(onSubmit)()
+    },
+  }))
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     setParams(values)
   }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
@@ -158,12 +174,11 @@ const FormMetalogDistribution = ({
             </FormItem>
           )}
         />
-        <Button type="submit" variant="outline" className="">
-          Update parameters
-        </Button>
       </form>
     </Form>
   )
-}
+})
 
 export default FormMetalogDistribution
+
+FormMetalogDistribution.displayName = "FormMetalogDistribution"
