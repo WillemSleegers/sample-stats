@@ -68,13 +68,25 @@ const App = () => {
     const currentSamples = samplesRef.current
     const quantiles = quantile(currentSamples, [0.1, 0.5, 0.9])
 
-    setStats({
+    const newStats = {
       p10: quantiles[0],
       p50: quantiles[1],
       p90: quantiles[2],
       min: min(currentSamples),
       max: max(currentSamples),
       mean: mean(currentSamples),
+    }
+
+    // Set new stats, if one of them has changed
+    setStats((prevStats) => {
+      const hasChanged =
+        prevStats.p10 !== newStats.p10 ||
+        prevStats.p50 !== newStats.p50 ||
+        prevStats.p90 !== newStats.p90 ||
+        prevStats.min !== newStats.min ||
+        prevStats.max !== newStats.max ||
+        prevStats.mean !== newStats.mean
+      return hasChanged ? newStats : prevStats
     })
   }, [])
 
@@ -82,10 +94,7 @@ const App = () => {
     const { n } = SPEED_SETTINGS[speed]
     const newSamples = draw(n, distribution, parameters)
 
-    setSamples((prevSamples) => {
-      const updatedSamples = [...prevSamples, ...newSamples]
-      return updatedSamples
-    })
+    setSamples((prevSamples) => [...prevSamples, ...newSamples])
   }, [distribution, parameters, speed])
 
   // Set intervals for drawing samples and updating statistics
@@ -104,7 +113,7 @@ const App = () => {
   }, [isSampling, addSamples, speed])
 
   useEffect(() => {
-    if (isSampling) {
+    if (isSampling && showStats) {
       const interval = 1000
       statsIntervalRef.current = setInterval(updateStats, interval)
     }
@@ -115,10 +124,10 @@ const App = () => {
         statsIntervalRef.current = null
       }
     }
-  }, [isSampling, updateStats])
+  }, [isSampling, showStats, updateStats])
 
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider defaultOpen={false}>
       <AppSidebar
         distribution={distribution}
         params={parameters}
@@ -126,7 +135,7 @@ const App = () => {
         setSpeed={setSpeed}
         setShowStats={setShowStats}
       />
-      <div className="w-full p-2">
+      <div className="w-full p-2 mb-16">
         <div className="p-2 flex justify-between">
           <SettingsSidebarTrigger className="size-9" />
           <div className="space-x-2">
@@ -142,34 +151,36 @@ const App = () => {
             <ThemeToggle />
           </div>
         </div>
-        <Hero />
-        <div className="flex flex-row gap-2 items-end justify-center">
-          <DistributionPicker
-            distribution={distribution}
-            setDistribution={setDistribution}
-          />
-          <Button className="w-32" onClick={handleClick}>
-            {isSampling ? (
-              <PauseIcon className="mr-2 h-4 w-4" />
-            ) : (
-              <PlayIcon className="mr-2 h-4 w-4" />
-            )}
-            {isSampling ? "Pause" : "Sample"}
-          </Button>
+        <div className="space-y-8">
+          <Hero />
+          <div className="flex flex-row gap-2 items-end justify-center">
+            <DistributionPicker
+              distribution={distribution}
+              setDistribution={setDistribution}
+            />
+            <Button className="w-32" onClick={handleClick}>
+              {isSampling ? (
+                <PauseIcon className="mr-2 h-4 w-4" />
+              ) : (
+                <PlayIcon className="mr-2 h-4 w-4" />
+              )}
+              {isSampling ? "Pause" : "Sample"}
+            </Button>
+          </div>
+
+          <div className="text-sm text-muted-foreground text-center">
+            Total Samples: {samples.length}
+          </div>
+
+          <FullScreen
+            handle={fullScreenHandle}
+            className="h-[400px] max-w-[600px] mx-auto"
+          >
+            <Histogram data={samples} binCount={10} />
+          </FullScreen>
+
+          {showStats && <StatisticsSummary stats={stats} />}
         </div>
-
-        <div className="text-sm text-muted-foreground text-center">
-          Total Samples: {samples.length}
-        </div>
-
-        <FullScreen
-          handle={fullScreenHandle}
-          className="h-[400px] max-w-[600px] mx-auto my-16"
-        >
-          <Histogram data={samples} binCount={10} />
-        </FullScreen>
-
-        {showStats && <StatisticsSummary stats={stats} />}
       </div>
     </SidebarProvider>
   )

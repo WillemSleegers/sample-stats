@@ -28,8 +28,8 @@ export function AppSidebar({
   return (
     <Sidebar>
       <SidebarHeader className="font-semibold text-lg">Settings</SidebarHeader>
-      <SidebarContent className="p-2 space-y-2">
-        <div>
+      <SidebarContent className="p-4 space-y-2">
+        <div className="space-y-2">
           <div>
             <div className="font-semibold text-base">Parameters</div>
             <div className="text-muted-foreground text-sm">
@@ -41,7 +41,7 @@ export function AppSidebar({
             setParams={setParams}
           />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-4">
           <div className="font-semibold text-base">Additional settings</div>
           <SelectSpeed setSpeed={setSpeed} />
           <div className="flex items-center space-x-2">
