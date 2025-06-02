@@ -45,7 +45,7 @@ export const Histogram = ({ data, binCount }: HistogramProps) => {
   }, [data, binCount])
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer width="100%" height="100%" className="bg-background">
       <BarChart data={prepareHistogramData()}>
         <Bar
           dataKey="count"

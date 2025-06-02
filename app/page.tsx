@@ -1,94 +1,96 @@
 "use client"
 
-import React, { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { FullScreen, useFullScreenHandle } from "react-full-screen"
-import { FullscreenIcon } from "lucide-react"
+import { FullscreenIcon, PauseIcon, PlayIcon } from "lucide-react"
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
+import { Hero } from "@/components/hero"
 import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Histogram } from "@/components/histogram"
+import { AppSidebar } from "@/components/app-sidebar"
+import { Histogram } from "@/components/graphs/histogram"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { DistributionForm } from "@/components/distribution-form"
+import { SidebarProvider } from "@/components/ui/sidebar"
+import { SettingsSidebarTrigger } from "@/components/sidebar-trigger"
+import { DistributionPicker } from "@/components/distribution-picker"
 
 import { draw } from "@/lib/draw"
+
+import { DEFAULT_PARAMETERS, SPEED_SETTINGS } from "@/lib/constants"
+
+import { Distribution, Parameters, SpeedSetting, Stats } from "@/lib/types"
 import { max, mean, min, quantile } from "@/lib/utils"
-
-import { SPEED_SETTINGS } from "@/lib/constants"
-
-import { Parameters, SpeedSetting, Stats } from "@/lib/types"
+import { StatisticsSummary } from "@/components/statistics"
 
 const App = () => {
-  const [parameters, setParameters] = useState<Parameters>({
-    distribution: "normal",
-    mean: 0,
-    sd: 1,
-  })
-  const [samples, setSamples] = useState<number[]>([])
+  // States
+  const [distribution, setDistribution] = useState<Distribution>("normal")
+  const [parameters, setParameters] = useState<Parameters>(
+    DEFAULT_PARAMETERS.normal
+  )
   const [isSampling, setIsSampling] = useState(false)
-  const [stats, setStats] = useState<Stats>({})
-
   const [speed, setSpeed] = useState<SpeedSetting>("normal")
-  const [binCount, setBinCount] = useState(20)
-  const [extraStats, setExtraStats] = useState(false)
+  const [samples, setSamples] = useState<number[]>([])
+  const [stats, setStats] = useState<Stats>({})
+  const [showStats, setShowStats] = useState(false)
 
-  const [fullScreenEnabled, setFullScreenEnabled] = useState(true)
-  const handle = useFullScreenHandle()
-
+  // Refs
   const samplingIntervalRef = useRef<ReturnType<typeof setInterval>>(null)
+  const statsIntervalRef = useRef<ReturnType<typeof setInterval>>(null)
+  const samplesRef = useRef<number[]>([])
 
+  // Full screen
+  const [fullScreenEnabled, setFullScreenEnabled] = useState(true)
+  const fullScreenHandle = useFullScreenHandle()
+
+  // Setup
   useEffect(() => {
     setFullScreenEnabled(window.document.fullscreenEnabled)
   }, [])
 
-  const updateStats = useCallback(
-    (newSamples: number[]) => {
-      if (newSamples.length === 0) return
+  // On distribution change
+  useEffect(() => {
+    setIsSampling(false)
+    setSamples([]) // Clear samples
+    setParameters(DEFAULT_PARAMETERS[distribution]) // Set default parameters
+  }, [distribution])
 
-      const quantiles = quantile(newSamples, [0.1, 0.5, 0.9])
+  // On samples change
+  useEffect(() => {
+    samplesRef.current = samples
+  }, [samples])
 
-      if (extraStats) {
-        setStats({
-          p10: quantiles[0],
-          p50: quantiles[1],
-          p90: quantiles[2],
-          min: min(newSamples),
-          max: max(newSamples),
-          mean: mean(newSamples),
-        })
-      } else {
-        setStats({
-          p10: quantiles[0],
-          p50: quantiles[1],
-          p90: quantiles[2],
-        })
-      }
-    },
-    [extraStats]
-  )
+  // Event handlers
+  const handleClick = () => {
+    setIsSampling((prev) => !prev)
+  }
+
+  const updateStats = useCallback(() => {
+    const currentSamples = samplesRef.current
+    const quantiles = quantile(currentSamples, [0.1, 0.5, 0.9])
+
+    setStats({
+      p10: quantiles[0],
+      p50: quantiles[1],
+      p90: quantiles[2],
+      min: min(currentSamples),
+      max: max(currentSamples),
+      mean: mean(currentSamples),
+    })
+  }, [])
 
   const addSamples = useCallback(() => {
     const { n } = SPEED_SETTINGS[speed]
-    const newSamples = draw(n, parameters)
+    const newSamples = draw(n, distribution, parameters)
 
     setSamples((prevSamples) => {
       const updatedSamples = [...prevSamples, ...newSamples]
-      updateStats(updatedSamples)
       return updatedSamples
     })
-  }, [parameters, updateStats, speed])
+  }, [distribution, parameters, speed])
 
+  // Set intervals for drawing samples and updating statistics
   useEffect(() => {
     if (isSampling) {
-      addSamples()
       const { interval } = SPEED_SETTINGS[speed]
       samplingIntervalRef.current = setInterval(addSamples, interval)
     }
@@ -101,147 +103,75 @@ const App = () => {
     }
   }, [isSampling, addSamples, speed])
 
-  const resetSampling = useCallback(() => {
-    setIsSampling(false)
-    setSamples([])
-    setStats({ p10: 0, p50: 0, p90: 0 })
-    if (samplingIntervalRef.current) {
-      clearInterval(samplingIntervalRef.current)
-      samplingIntervalRef.current = null
+  useEffect(() => {
+    if (isSampling) {
+      const interval = 1000
+      statsIntervalRef.current = setInterval(updateStats, interval)
     }
-  }, [])
+
+    return () => {
+      if (statsIntervalRef.current) {
+        clearInterval(statsIntervalRef.current)
+        statsIntervalRef.current = null
+      }
+    }
+  }, [isSampling, updateStats])
 
   return (
-    <div className="my-4 space-y-4 max-w-6xl mx-auto p-4">
-      <div className="flex flex-col gap-4 my-8 justify-items-center text-center">
-        <div>
-          <ThemeToggle />
-        </div>
-
-        <h1 className="text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1]">
-          Sample Stats
-        </h1>
-        <p className="text-lg font-light text-foreground">
-          Watch distributions come alive, one sample at a time
-        </p>
-      </div>
-
-      <div className="flex gap-4 flex-col md:flex-row">
-        <div className="flex flex-col sm:flex-row md:flex-col gap-4">
-          <DistributionForm
-            setParameters={setParameters}
-            isSampling={isSampling}
-            setIsSampling={setIsSampling}
-            resetSampling={resetSampling}
-          />
-          <div className="bg-card p-4 border rounded-xl grow space-y-4 min-w-48">
-            <div className="space-y-2">
-              <Label htmlFor="speed">Speed</Label>
-              <Select
-                onValueChange={(e: SpeedSetting) => {
-                  setSpeed(e)
-                }}
-                defaultValue="normal"
-              >
-                <SelectTrigger id="speed" className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="slow">Slow</SelectItem>
-                  <SelectItem value="normal">Normal</SelectItem>
-                  <SelectItem value="fast">Fast</SelectItem>
-                  <SelectItem value="faster">Faster</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="bins">Bins</Label>
-              <Input
-                defaultValue={binCount}
-                onChange={(event) => setBinCount(Number(event.target.value))}
-                type="number"
-                min={10}
-                max={100}
-                className="mt-2"
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="extra-stats"
-                checked={extraStats}
-                onCheckedChange={() => {
-                  setExtraStats((prev) => !prev)
-                }}
-              />
-              <Label htmlFor="extra-stats">Extra statistics</Label>
-            </div>
-          </div>
-        </div>
-
-        <div className="border rounded-xl flex flex-col grow justify-between p-4 gap-4">
-          <div className="flex justify-between align-middle">
-            <div className="text-sm text-muted-foreground text-center">
-              Total Samples: {samples.length}
-            </div>
+    <SidebarProvider defaultOpen={true}>
+      <AppSidebar
+        distribution={distribution}
+        params={parameters}
+        setParams={setParameters}
+        setSpeed={setSpeed}
+        setShowStats={setShowStats}
+      />
+      <div className="w-full p-2">
+        <div className="p-2 flex justify-between">
+          <SettingsSidebarTrigger className="size-9" />
+          <div className="space-x-2">
             {fullScreenEnabled && (
-              <Button size="icon" variant="ghost" onClick={handle.enter}>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={fullScreenHandle.enter}
+              >
                 <FullscreenIcon />
               </Button>
             )}
-          </div>
-
-          <FullScreen handle={handle} className="h-[450px]">
-            <Histogram data={samples} binCount={binCount} />
-          </FullScreen>
-
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <Label>10th Percentile</Label>
-              <div className="text-xl font-bold">
-                {stats.p10 ? stats.p10.toFixed(2) : "-"}
-              </div>
-            </div>
-            <div>
-              <Label>50th Percentile</Label>
-              <div className="text-xl font-bold">
-                {stats.p50 ? stats.p50.toFixed(2) : "-"}
-              </div>
-            </div>
-            <div>
-              <Label>90th Percentile</Label>
-              <div className="text-xl font-bold">
-                {stats.p90 ? stats.p90.toFixed(2) : "-"}
-              </div>
-            </div>
-
-            {extraStats && (
-              <div>
-                <Label>Min</Label>
-                <div className="text-xl font-bold">
-                  {stats.min ? stats.min.toFixed(2) : "-"}
-                </div>
-              </div>
-            )}
-            {extraStats && (
-              <div>
-                <Label>Mean</Label>
-                <div className="text-xl font-bold">
-                  {stats.mean ? stats.mean.toFixed(2) : "-"}
-                </div>
-              </div>
-            )}
-            {extraStats && (
-              <div>
-                <Label>Max</Label>
-                <div className="text-xl font-bold">
-                  {stats.max ? stats.max.toFixed(2) : "-"}
-                </div>
-              </div>
-            )}
+            <ThemeToggle />
           </div>
         </div>
+        <Hero />
+        <div className="flex flex-row gap-2 items-end justify-center">
+          <DistributionPicker
+            distribution={distribution}
+            setDistribution={setDistribution}
+          />
+          <Button className="w-32" onClick={handleClick}>
+            {isSampling ? (
+              <PauseIcon className="mr-2 h-4 w-4" />
+            ) : (
+              <PlayIcon className="mr-2 h-4 w-4" />
+            )}
+            {isSampling ? "Pause" : "Sample"}
+          </Button>
+        </div>
+
+        <div className="text-sm text-muted-foreground text-center">
+          Total Samples: {samples.length}
+        </div>
+
+        <FullScreen
+          handle={fullScreenHandle}
+          className="h-[400px] max-w-[600px] mx-auto my-16"
+        >
+          <Histogram data={samples} binCount={10} />
+        </FullScreen>
+
+        {showStats && <StatisticsSummary stats={stats} />}
       </div>
-    </div>
+    </SidebarProvider>
   )
 }
 

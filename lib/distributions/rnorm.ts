@@ -1,7 +1,4 @@
-import {
-  assertPositive,
-  assertPositiveInteger,
-} from "@/lib/distributions/validation"
+import { assertPositive, assertPositiveInteger } from "@/lib/validation"
 
 /**
  * Generates a pair of independent standard normal random variables using the Box–Muller transform.
