@@ -38,6 +38,8 @@ const App = () => {
   const [samples, setSamples] = useState<number[]>([])
   const [stats, setStats] = useState<Stats>({})
   const [showStats, setShowStats] = useState(false)
+  const [binCount, setBinCount] = useState(10)
+  const [useSturges, setUseSturges] = useState(false)
 
   // Refs
   const samplingIntervalRef = useRef<ReturnType<typeof setInterval>>(null)
@@ -146,6 +148,10 @@ const App = () => {
         setParams={setParameters}
         setSpeed={setSpeed}
         setShowStats={setShowStats}
+        binCount={binCount}
+        setBinCount={setBinCount}
+        useSturges={useSturges}
+        setUseSturges={setUseSturges}
       />
       <div className="w-full p-2 mb-16">
         <div className="p-2 flex justify-between">
@@ -188,7 +194,10 @@ const App = () => {
             handle={fullScreenHandle}
             className="h-[400px] max-w-[600px] mx-auto"
           >
-            <Histogram data={samples} binCount={10} />
+            <Histogram
+              data={samples}
+              binCount={useSturges ? Math.ceil(Math.log2(samples.length) + 1) : binCount}
+            />
           </FullScreen>
 
           {showStats && <StatisticsSummary stats={stats} />}

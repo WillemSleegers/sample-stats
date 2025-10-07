@@ -10,6 +10,7 @@ import { Dispatch, forwardRef, SetStateAction } from "react"
 import { SelectSpeed } from "./select-speed"
 import { Switch } from "./ui/switch"
 import { Label } from "./ui/label"
+import { Input } from "./ui/input"
 
 type AppSidebarProps = {
   distribution: Distribution
@@ -17,10 +18,14 @@ type AppSidebarProps = {
   setParams: Dispatch<SetStateAction<Parameters>>
   setSpeed: Dispatch<SetStateAction<SpeedSetting>>
   setShowStats: Dispatch<SetStateAction<boolean>>
+  binCount: number
+  setBinCount: Dispatch<SetStateAction<number>>
+  useSturges: boolean
+  setUseSturges: Dispatch<SetStateAction<boolean>>
 }
 
 export const AppSidebar = forwardRef<FormHandle, AppSidebarProps>(
-  ({ distribution, setParams, setSpeed, setShowStats }, ref) => {
+  ({ distribution, setParams, setSpeed, setShowStats, binCount, setBinCount, useSturges, setUseSturges }, ref) => {
     return (
       <Sidebar>
         <SidebarHeader className="font-semibold text-lg">
@@ -51,6 +56,28 @@ export const AppSidebar = forwardRef<FormHandle, AppSidebarProps>(
                 }}
               />
               <Label htmlFor="showStats">Show statistics</Label>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="useSturges"
+                  checked={useSturges}
+                  onCheckedChange={setUseSturges}
+                />
+                <Label htmlFor="useSturges">Use Sturges' method</Label>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="binCount">Bin count</Label>
+                <Input
+                  id="binCount"
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={binCount}
+                  onChange={(e) => setBinCount(Number(e.target.value))}
+                  disabled={useSturges}
+                />
+              </div>
             </div>
           </div>
         </SidebarContent>
