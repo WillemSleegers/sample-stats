@@ -186,9 +186,11 @@ const App = () => {
             </Button>
           </div>
 
-          <div className="text-sm text-muted-foreground text-center">
-            Total Samples: {samples.length}
-          </div>
+          {samples.length > 0 && (
+            <div className="text-sm text-muted-foreground text-center">
+              Total Samples: {samples.length.toLocaleString()}
+            </div>
+          )}
 
           <FullScreen
             handle={fullScreenHandle}
@@ -197,6 +199,7 @@ const App = () => {
             <Histogram
               data={samples}
               binCount={useSturges ? Math.ceil(Math.log2(samples.length) + 1) : binCount}
+              animationDuration={SPEED_SETTINGS[speed].animationDuration}
             />
           </FullScreen>
 

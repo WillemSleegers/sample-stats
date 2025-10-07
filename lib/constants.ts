@@ -1,8 +1,8 @@
 export const SPEED_SETTINGS = {
-  slow: { interval: 1000, n: 1 },
-  normal: { interval: 250, n: 1 },
-  fast: { interval: 50, n: 2 },
-  fastest: { interval: 25, n: 4 },
+  slow: { interval: 1000, n: 1, animationDuration: 1000 },
+  normal: { interval: 250, n: 1, animationDuration: 500 },
+  fast: { interval: 100, n: 1, animationDuration: 100 },
+  fastest: { interval: 50, n: 1, animationDuration: 0 },
 }
 
 export const DEFAULT_PARAMETERS = {

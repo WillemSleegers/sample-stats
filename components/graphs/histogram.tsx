@@ -1,14 +1,15 @@
-import { useCallback } from "react"
+import { useMemo } from "react"
 import { BarChart, Bar, ResponsiveContainer } from "recharts"
 
 type HistogramProps = {
   data: number[]
   binCount: number
+  animationDuration?: number
 }
 
-export const Histogram = ({ data, binCount }: HistogramProps) => {
-  const prepareHistogramData = useCallback(() => {
-    if (data.length === 0) return [{ bin: "0", count: 0 }]
+export const Histogram = ({ data, binCount, animationDuration = 500 }: HistogramProps) => {
+  const histogramData = useMemo(() => {
+    if (data.length === 0) return []
 
     const min = Math.min(...data)
     const max = Math.max(...data)
@@ -44,13 +45,18 @@ export const Histogram = ({ data, binCount }: HistogramProps) => {
     }))
   }, [data, binCount])
 
+  // Return null when there's no data to avoid rendering empty chart
+  if (data.length === 0) {
+    return null
+  }
+
   return (
     <ResponsiveContainer width="100%" height="100%" className="bg-background">
-      <BarChart data={prepareHistogramData()}>
+      <BarChart data={histogramData}>
         <Bar
           dataKey="count"
           fill="#16a34a"
-          animationDuration={500}
+          animationDuration={animationDuration}
           animationEasing="ease-in-out"
         />
       </BarChart>
