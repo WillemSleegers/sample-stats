@@ -1,5 +1,4 @@
 import {
-  Distribution,
   Parameters,
   ParamsNormal,
   ParamsLognormal,
@@ -90,26 +89,20 @@ function pertPdf(x: number, params: ParamsPert): number {
 }
 
 // Main PDF function
-export function calculatePdf(
-  x: number,
-  distribution: Distribution,
-  params: Parameters
-): number {
-  switch (distribution) {
+export function calculatePdf(x: number, params: Parameters): number {
+  switch (params.type) {
     case "normal":
-      return normalPdf(x, params as ParamsNormal)
+      return normalPdf(x, params)
     case "lognormal":
-      return lognormalPdf(x, params as ParamsLognormal)
+      return lognormalPdf(x, params)
     case "uniform":
-      return uniformPdf(x, params as ParamsUniform)
+      return uniformPdf(x, params)
     case "beta":
-      return betaPdf(x, params as ParamsBeta)
+      return betaPdf(x, params)
     case "pert":
-      return pertPdf(x, params as ParamsPert)
+      return pertPdf(x, params)
     case "metalog":
       // Metalog doesn't have a simple closed-form PDF
-      return 0
-    default:
       return 0
   }
 }
@@ -118,7 +111,6 @@ export function calculatePdf(
 export function generatePdfCurve(
   min: number,
   max: number,
-  distribution: Distribution,
   params: Parameters,
   points = 100
 ): Array<{ x: number; y: number }> {
@@ -127,7 +119,7 @@ export function generatePdfCurve(
 
   for (let i = 0; i <= points; i++) {
     const x = min + i * step
-    const y = calculatePdf(x, distribution, params)
+    const y = calculatePdf(x, params)
     curve.push({ x, y })
   }
 

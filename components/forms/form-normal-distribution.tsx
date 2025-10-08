@@ -54,7 +54,7 @@ const FormNormalDistribution = forwardRef<
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values)
-    setParams(values)
+    setParams({ type: "normal", ...values })
   }
 
   return (

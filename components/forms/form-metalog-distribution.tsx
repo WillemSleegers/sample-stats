@@ -88,7 +88,7 @@ const FormMetalogDistribution = forwardRef<
   }))
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setParams(values)
+    setParams({ type: "metalog", ...values })
   }
 
   return (

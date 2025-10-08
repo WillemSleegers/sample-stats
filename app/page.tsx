@@ -15,7 +15,7 @@ import { DistributionPicker } from "@/components/distribution-picker"
 
 import { draw } from "@/lib/draw"
 
-import { DEFAULT_PARAMETERS, SPEED_SETTINGS } from "@/lib/constants"
+import { DEFAULT_PARAMETERS, SPEED_SETTINGS, MAX_SAMPLES } from "@/lib/constants"
 
 import {
   Distribution,
@@ -72,7 +72,6 @@ const App = () => {
   // Event handlers
   const handleClick = () => {
     if (formRef.current) {
-      console.log("submitting form")
       formRef.current.submitForm()
     }
     setIsSampling((prev) => !prev)
@@ -112,10 +111,31 @@ const App = () => {
 
   const addSamples = useCallback(() => {
     const { n } = SPEED_SETTINGS[speed]
-    const newSamples = draw(n, distribution, parameters)
+    const newSamples = draw(n, parameters)
 
-    setSamples((prevSamples) => [...prevSamples, ...newSamples])
-  }, [distribution, parameters, speed])
+    setSamples((prevSamples) => {
+      // Stop sampling if we've reached the maximum
+      if (prevSamples.length >= MAX_SAMPLES) {
+        return prevSamples
+      }
+
+      const combined = [...prevSamples, ...newSamples]
+
+      // If this batch would exceed the limit, cap at MAX_SAMPLES
+      if (combined.length >= MAX_SAMPLES) {
+        return combined.slice(0, MAX_SAMPLES)
+      }
+
+      return combined
+    })
+  }, [parameters, speed])
+
+  // Stop sampling when we reach the limit
+  useEffect(() => {
+    if (samples.length >= MAX_SAMPLES && isSampling) {
+      setIsSampling(false)
+    }
+  }, [samples.length, isSampling])
 
   // Set intervals for drawing samples and updating statistics
   useEffect(() => {
@@ -222,7 +242,6 @@ const App = () => {
               binCount={useSturges ? Math.ceil(Math.log2(samples.length) + 1) : binCount}
               animationDuration={SPEED_SETTINGS[speed].animationDuration}
               showPdf={showPdf}
-              distribution={distribution}
               parameters={parameters}
             />
           </FullScreen>

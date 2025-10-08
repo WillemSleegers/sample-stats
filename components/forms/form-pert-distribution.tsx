@@ -62,7 +62,7 @@ const FormPertDistribution = forwardRef<FormHandle, FormPertDistributionProps>(
     }))
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-      setParams(values)
+      setParams({ type: "pert", ...values })
     }
 
     return (

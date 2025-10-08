@@ -51,7 +51,7 @@ const FormBetaDistribution = forwardRef<FormHandle, FormBetaDistributionProps>(
     }))
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-      setParams(values)
+      setParams({ type: "beta", ...values })
     }
     return (
       <Form {...form}>

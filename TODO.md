@@ -17,11 +17,11 @@
 
 ### Other Priority
 
-- [ ] **Reduce spacing between bars in full screen** - The spacing between bars becomes very large when going fullscreen.
-- [ ] **Fix inconsistent bar width** - The leftmost and rightmost bar are half the width of the other bars. All bars should have the same width.
-- [ ] **Remove focus line around graph** - There should not be a focus outline around the graph when the user clicks on the graph.
-- [ ] **Fix dropdown delayed appearance** - When the page first loads, the dropdown loads, but there's a delay in when the value of the dropdown shows up. The value 'Normal' only appears a second or so after the page loads.
-- [ ] **Improve the look of the title** - Currently the title consist of a large title with a subtitle. The subtitle doesn't look particularly nice. Re-evaluate the title and subtitle to see if we those can better match modern aesthetics.
+- [x] **Reduce spacing between bars in full screen** - The spacing between bars becomes very large when going fullscreen. ✅
+- [x] **Fix inconsistent bar width** - The leftmost and rightmost bar are half the width of the other bars. All bars should have the same width. ✅
+- [x] **Remove focus line around graph** - There should not be a focus outline around the graph when the user clicks on the graph. ✅
+- [x] **Fix dropdown delayed appearance** - When the page first loads, the dropdown loads, but there's a delay in when the value of the dropdown shows up. The value 'Normal' only appears a second or so after the page loads. ✅
+- [x] **Improve the look of the title** - Currently the title consist of a large title with a subtitle. The subtitle doesn't look particularly nice. Re-evaluate the title and subtitle to see if we those can better match modern aesthetics. ✅
 - [ ] **Add new Shadcn components** - Shadcn released new components, one of them is a Field component (https://ui.shadcn.com/docs/components/field) which I think we can use in our sidebar. Maybe also on the main page with the distribution dropdown and sample button.
 
 ## Codebase Improvements

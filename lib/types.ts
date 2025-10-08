@@ -9,28 +9,34 @@ export type Distribution =
   | "metalog"
 
 export type ParamsNormal = {
+  type: "normal"
   mean: number
   sd: number
 }
 
 export type ParamsLognormal = {
+  type: "lognormal"
   meanlog: number
   sdlog: number
 }
 export type ParamsUniform = {
+  type: "uniform"
   min: number
   max: number
 }
 export type ParamsBeta = {
+  type: "beta"
   alpha: number
   beta: number
 }
 export type ParamsPert = {
+  type: "pert"
   min: number
   mode: number
   max: number
 }
 export type ParamsMetalog = {
+  type: "metalog"
   p10: number
   p50: number
   p90: number

@@ -53,7 +53,7 @@ const FormUniformDistribution = forwardRef<
   }))
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setParams(values)
+    setParams({ type: "uniform", ...values })
   }
 
   return (

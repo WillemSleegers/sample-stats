@@ -7,7 +7,7 @@ import {
   YAxis,
   XAxis,
 } from "recharts"
-import { Distribution, Parameters } from "@/lib/types"
+import { Parameters } from "@/lib/types"
 import { generatePdfCurve } from "@/lib/pdf"
 
 type HistogramProps = {
@@ -15,7 +15,6 @@ type HistogramProps = {
   binCount: number
   animationDuration?: number
   showPdf?: boolean
-  distribution?: Distribution
   parameters?: Parameters
 }
 
@@ -24,7 +23,6 @@ export const Histogram = ({
   binCount,
   animationDuration = 500,
   showPdf = false,
-  distribution,
   parameters,
 }: HistogramProps) => {
   const { histogramData, maxY } = useMemo(() => {
@@ -69,10 +67,10 @@ export const Histogram = ({
     const maxYValue = Math.max(...histogramBars.map((b) => b.count))
 
     // Add PDF values to histogram bars if needed
-    if (showPdf && distribution && parameters) {
+    if (showPdf && parameters) {
       const pdfValues = bins.map((bin) => {
         const x = (bin.binStart + bin.binEnd) / 2
-        return generatePdfCurve(x, x, distribution, parameters, 1)[0]?.y || 0
+        return generatePdfCurve(x, x, parameters, 1)[0]?.y || 0
       })
 
       const maxPdf = Math.max(...pdfValues)
@@ -87,7 +85,7 @@ export const Histogram = ({
       histogramData: histogramBars,
       maxY: maxYValue,
     }
-  }, [data, binCount, showPdf, distribution, parameters])
+  }, [data, binCount, showPdf, parameters])
 
   // Chart data is just the histogram data with optional PDF values
   const chartData = histogramData

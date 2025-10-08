@@ -53,7 +53,7 @@ const FormLognormalDistribution = forwardRef<
   }))
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setParams(values)
+    setParams({ type: "lognormal", ...values })
   }
   return (
     <Form {...form}>
