@@ -20,26 +20,24 @@ export const DistributionPicker = ({
   setDistribution,
 }: DistributionPickerProps) => {
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="distribution">Distribution</Label>
-        <Select
-          value={distribution}
-          onValueChange={(value: Distribution) => setDistribution(value)}
-        >
-          <SelectTrigger className="w-36">
-            <SelectValue id="distribution" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="normal">Normal</SelectItem>
-            <SelectItem value="lognormal">Log-normal</SelectItem>
-            <SelectItem value="uniform">Uniform</SelectItem>
-            <SelectItem value="beta">Beta</SelectItem>
-            <SelectItem value="pert">PERT</SelectItem>
-            <SelectItem value="metalog">Metalog</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="flex flex-col gap-2 w-full">
+      <Label htmlFor="distribution">Distribution</Label>
+      <Select
+        value={distribution}
+        onValueChange={(value: Distribution) => setDistribution(value)}
+      >
+        <SelectTrigger className="w-full">
+          <SelectValue id="distribution" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="normal">Normal</SelectItem>
+          <SelectItem value="lognormal">Log-normal</SelectItem>
+          <SelectItem value="uniform">Uniform</SelectItem>
+          <SelectItem value="beta">Beta</SelectItem>
+          <SelectItem value="pert">PERT</SelectItem>
+          <SelectItem value="metalog">Metalog</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   )
 }

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import { FullScreen, useFullScreenHandle } from "react-full-screen"
-import { FullscreenIcon, PauseIcon, PlayIcon } from "lucide-react"
+import { FullscreenIcon, PauseIcon, PlayIcon, RotateCcwIcon } from "lucide-react"
 
 import { Hero } from "@/components/hero"
 import { Button } from "@/components/ui/button"
@@ -76,6 +76,12 @@ const App = () => {
       formRef.current.submitForm()
     }
     setIsSampling((prev) => !prev)
+  }
+
+  const handleClear = () => {
+    setIsSampling(false)
+    setSamples([])
+    setStats({})
   }
 
   const updateStats = useCallback(() => {
@@ -174,19 +180,31 @@ const App = () => {
         </div>
         <div className="space-y-8">
           <Hero />
-          <div className="flex flex-row gap-2 items-end justify-center">
+          <div className="flex flex-col gap-2 items-stretch justify-center max-w-fit mx-auto">
             <DistributionPicker
               distribution={distribution}
               setDistribution={setDistribution}
             />
-            <Button className="w-32" onClick={handleClick}>
-              {isSampling ? (
-                <PauseIcon className="mr-2 h-4 w-4" />
-              ) : (
-                <PlayIcon className="mr-2 h-4 w-4" />
-              )}
-              {isSampling ? "Pause" : "Sample"}
-            </Button>
+            <div className="flex flex-row gap-2">
+              <Button className="w-32 justify-start" onClick={handleClick}>
+                <div className="w-4 h-4 mr-2">
+                  {isSampling ? (
+                    <PauseIcon className="h-4 w-4" />
+                  ) : (
+                    <PlayIcon className="h-4 w-4" />
+                  )}
+                </div>
+                {isSampling ? "Pause" : "Sample"}
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleClear}
+                disabled={samples.length === 0}
+              >
+                <RotateCcwIcon className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
           {samples.length > 0 && (

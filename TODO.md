@@ -11,8 +11,7 @@
 ### Medium Priority
 
 - [x] **Probability density overlay** - Overlay theoretical PDF curve on histogram to compare empirical vs theoretical distributions ✅
-- [ ] **Real-time stats** - Show stats by default and update more frequently than current 1 second interval (app/page.tsx:128)
-- [ ] **Clear samples button** - Add reset button to clear samples without changing distribution
+- [x] **Clear samples button** - Add reset button to clear samples without changing distribution ✅
 - [ ] **Parameter validation feedback** - Add helper text showing valid ranges (e.g., "SD must be positive")
 - [ ] **Mobile responsiveness** - Make histogram height (app/page.tsx:189) responsive instead of fixed 400px
 
