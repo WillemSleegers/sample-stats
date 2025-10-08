@@ -67,7 +67,7 @@ const FormLognormalDistribution = forwardRef<
               <FormControl>
                 <Input type="number" className="bg-background" {...field} />
               </FormControl>
-              <FormDescription></FormDescription>
+              <FormDescription>Mean of the underlying normal distribution</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -81,7 +81,7 @@ const FormLognormalDistribution = forwardRef<
               <FormControl>
                 <Input type="number" className="bg-background" {...field} />
               </FormControl>
-              <FormDescription></FormDescription>
+              <FormDescription>Spread of the underlying normal distribution (must be &gt; 0)</FormDescription>
               <FormMessage />
             </FormItem>
           )}

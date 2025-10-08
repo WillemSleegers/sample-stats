@@ -68,7 +68,7 @@ const FormUniformDistribution = forwardRef<
               <FormControl>
                 <Input type="number" className="bg-background" {...field} />
               </FormControl>
-              <FormDescription></FormDescription>
+              <FormDescription>Lower bound of the range</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -82,7 +82,7 @@ const FormUniformDistribution = forwardRef<
               <FormControl>
                 <Input type="number" className="bg-background" {...field} />
               </FormControl>
-              <FormDescription></FormDescription>
+              <FormDescription>Upper bound of the range</FormDescription>
               <FormMessage />
             </FormItem>
           )}

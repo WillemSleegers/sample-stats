@@ -103,7 +103,7 @@ const FormMetalogDistribution = forwardRef<
               <FormControl>
                 <Input type="number" className="bg-background" {...field} />
               </FormControl>
-              <FormDescription></FormDescription>
+              <FormDescription>10% of values will be below this (must be &lt; p50)</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -117,7 +117,7 @@ const FormMetalogDistribution = forwardRef<
               <FormControl>
                 <Input type="number" className="bg-background" {...field} />
               </FormControl>
-              <FormDescription></FormDescription>
+              <FormDescription>Median value (must be between p10 and p90)</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -131,7 +131,7 @@ const FormMetalogDistribution = forwardRef<
               <FormControl>
                 <Input type="number" className="bg-background" {...field} />
               </FormControl>
-              <FormDescription></FormDescription>
+              <FormDescription>90% of values will be below this (must be &gt; p50)</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -150,7 +150,7 @@ const FormMetalogDistribution = forwardRef<
                   {...field}
                 />
               </FormControl>
-              <FormDescription></FormDescription>
+              <FormDescription>Optional absolute minimum</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -169,7 +169,7 @@ const FormMetalogDistribution = forwardRef<
                   {...field}
                 />
               </FormControl>
-              <FormDescription></FormDescription>
+              <FormDescription>Optional absolute maximum</FormDescription>
               <FormMessage />
             </FormItem>
           )}

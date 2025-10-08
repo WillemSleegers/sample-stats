@@ -69,7 +69,7 @@ const FormNormalDistribution = forwardRef<
               <FormControl>
                 <Input type="number" className="bg-background" {...field} />
               </FormControl>
-              <FormDescription></FormDescription>
+              <FormDescription>Center of the distribution</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -83,7 +83,7 @@ const FormNormalDistribution = forwardRef<
               <FormControl>
                 <Input type="number" className="bg-background" {...field} />
               </FormControl>
-              <FormDescription></FormDescription>
+              <FormDescription>Spread of the distribution (must be &gt; 0)</FormDescription>
               <FormMessage />
             </FormItem>
           )}

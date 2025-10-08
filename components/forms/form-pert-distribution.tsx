@@ -32,11 +32,11 @@ const formSchema = z
     max: z.coerce.number(),
   })
   .refine((data) => data.min < data.mode, {
-    message: "Min must be smaller than mode",
+    message: "Minimum must be smaller than mode",
     path: ["min"],
   })
   .refine((data) => data.mode < data.max, {
-    message: "Mode must be smaller than max",
+    message: "Mode must be smaller than maximum",
     path: ["mode"],
   })
 
@@ -77,7 +77,7 @@ const FormPertDistribution = forwardRef<FormHandle, FormPertDistributionProps>(
                 <FormControl>
                   <Input type="number" className="bg-background" {...field} />
                 </FormControl>
-                <FormDescription></FormDescription>
+                <FormDescription>Minimum possible value (must be &lt; mode)</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -91,7 +91,7 @@ const FormPertDistribution = forwardRef<FormHandle, FormPertDistributionProps>(
                 <FormControl>
                   <Input type="number" className="bg-background" {...field} />
                 </FormControl>
-                <FormDescription></FormDescription>
+                <FormDescription>Most likely value (must be between min and max)</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -105,7 +105,7 @@ const FormPertDistribution = forwardRef<FormHandle, FormPertDistributionProps>(
                 <FormControl>
                   <Input type="number" className="bg-background" {...field} />
                 </FormControl>
-                <FormDescription></FormDescription>
+                <FormDescription>Maximum possible value (must be &gt; mode)</FormDescription>
                 <FormMessage />
               </FormItem>
             )}

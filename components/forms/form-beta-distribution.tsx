@@ -65,7 +65,7 @@ const FormBetaDistribution = forwardRef<FormHandle, FormBetaDistributionProps>(
                 <FormControl>
                   <Input type="number" className="bg-background" {...field} />
                 </FormControl>
-                <FormDescription></FormDescription>
+                <FormDescription>First shape parameter (must be &gt; 0)</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -79,7 +79,7 @@ const FormBetaDistribution = forwardRef<FormHandle, FormBetaDistributionProps>(
                 <FormControl>
                   <Input type="number" className="bg-background" {...field} />
                 </FormControl>
-                <FormDescription></FormDescription>
+                <FormDescription>Second shape parameter (must be &gt; 0)</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
