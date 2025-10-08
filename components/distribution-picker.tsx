@@ -15,6 +15,18 @@ type DistributionPickerProps = {
   setDistribution: Dispatch<SetStateAction<Distribution>>
 }
 
+const getDisplayName = (dist: Distribution): string => {
+  const names: Record<Distribution, string> = {
+    normal: "Normal",
+    lognormal: "Log-normal",
+    uniform: "Uniform",
+    beta: "Beta",
+    pert: "PERT",
+    metalog: "Metalog",
+  }
+  return names[dist]
+}
+
 export const DistributionPicker = ({
   distribution,
   setDistribution,
@@ -27,7 +39,9 @@ export const DistributionPicker = ({
         onValueChange={(value: Distribution) => setDistribution(value)}
       >
         <SelectTrigger className="w-full">
-          <SelectValue id="distribution" />
+          <SelectValue id="distribution">
+            {getDisplayName(distribution)}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="normal">Normal</SelectItem>

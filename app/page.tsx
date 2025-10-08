@@ -215,7 +215,7 @@ const App = () => {
 
           <FullScreen
             handle={fullScreenHandle}
-            className="h-[400px] max-w-[600px] mx-auto"
+            className="h-[400px] max-w-[600px] mx-auto outline-none"
           >
             <Histogram
               data={samples}

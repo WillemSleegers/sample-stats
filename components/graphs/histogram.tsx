@@ -92,21 +92,19 @@ export const Histogram = ({
   // Chart data is just the histogram data with optional PDF values
   const chartData = histogramData
 
-  // Calculate bar size based on number of bins
-  const barSize = useMemo(() => {
-    if (binCount === 0) return 20
-    return Math.max(5, Math.floor(400 / binCount)) // Approximate width based on bin count
-  }, [binCount])
-
   // Return null when there's no data to avoid rendering empty chart
   if (data.length === 0) {
     return null
   }
 
   return (
-    <ResponsiveContainer width="100%" height="100%" className="bg-background">
-      <ComposedChart data={chartData}>
-        <XAxis dataKey="index" hide type="number" domain={[0, binCount - 1]} />
+    <ResponsiveContainer
+      width="100%"
+      height="100%"
+      className="bg-background outline-none [&_svg]:outline-none [&_svg]:focus:outline-none"
+    >
+      <ComposedChart data={chartData} barCategoryGap="5%">
+        <XAxis dataKey="index" hide />
         <YAxis hide domain={[0, maxY * 1.1]} />
         {showPdf && (
           <Line
@@ -125,7 +123,6 @@ export const Histogram = ({
           fill="#16a34a"
           animationDuration={animationDuration}
           animationEasing="ease-in-out"
-          barSize={barSize}
         />
       </ComposedChart>
     </ResponsiveContainer>

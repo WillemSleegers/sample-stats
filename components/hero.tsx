@@ -1,11 +1,11 @@
 export function Hero() {
   return (
-    <div className="space-y-4 mx-auto mb-8">
-      <div className="flex flex-col gap-4 justify-items-center text-center">
-        <h1 className="text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1]">
+    <div className="mx-auto mb-12">
+      <div className="flex flex-col gap-3 justify-items-center text-center">
+        <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
           Sample Stats
         </h1>
-        <p className="text-lg font-light text-foreground">
+        <p className="text-lg text-muted-foreground max-w-[600px] mx-auto">
           Explore distributions through interactive sampling
         </p>
       </div>
