@@ -40,6 +40,7 @@ const App = () => {
   const [showStats, setShowStats] = useState(false)
   const [binCount, setBinCount] = useState(10)
   const [useSturges, setUseSturges] = useState(false)
+  const [showPdf, setShowPdf] = useState(false)
 
   // Refs
   const samplingIntervalRef = useRef<ReturnType<typeof setInterval>>(null)
@@ -152,6 +153,8 @@ const App = () => {
         setBinCount={setBinCount}
         useSturges={useSturges}
         setUseSturges={setUseSturges}
+        showPdf={showPdf}
+        setShowPdf={setShowPdf}
       />
       <div className="w-full p-2 mb-16">
         <div className="p-2 flex justify-between">
@@ -200,6 +203,9 @@ const App = () => {
               data={samples}
               binCount={useSturges ? Math.ceil(Math.log2(samples.length) + 1) : binCount}
               animationDuration={SPEED_SETTINGS[speed].animationDuration}
+              showPdf={showPdf}
+              distribution={distribution}
+              parameters={parameters}
             />
           </FullScreen>
 

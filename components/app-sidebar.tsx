@@ -22,10 +22,12 @@ type AppSidebarProps = {
   setBinCount: Dispatch<SetStateAction<number>>
   useSturges: boolean
   setUseSturges: Dispatch<SetStateAction<boolean>>
+  showPdf: boolean
+  setShowPdf: Dispatch<SetStateAction<boolean>>
 }
 
 export const AppSidebar = forwardRef<FormHandle, AppSidebarProps>(
-  ({ distribution, setParams, setSpeed, setShowStats, binCount, setBinCount, useSturges, setUseSturges }, ref) => {
+  ({ distribution, setParams, setSpeed, setShowStats, binCount, setBinCount, useSturges, setUseSturges, showPdf, setShowPdf }, ref) => {
     return (
       <Sidebar>
         <SidebarHeader className="font-semibold text-lg">
@@ -57,6 +59,14 @@ export const AppSidebar = forwardRef<FormHandle, AppSidebarProps>(
               />
               <Label htmlFor="showStats">Show statistics</Label>
             </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="showPdf"
+                checked={showPdf}
+                onCheckedChange={setShowPdf}
+              />
+              <Label htmlFor="showPdf">Show probability density overlay</Label>
+            </div>
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <Switch
@@ -64,7 +74,7 @@ export const AppSidebar = forwardRef<FormHandle, AppSidebarProps>(
                   checked={useSturges}
                   onCheckedChange={setUseSturges}
                 />
-                <Label htmlFor="useSturges">Use Sturges' method</Label>
+                <Label htmlFor="useSturges">Use Sturges&apos; method</Label>
               </div>
               <div className="space-y-1">
                 <Label htmlFor="binCount">Bin count</Label>
