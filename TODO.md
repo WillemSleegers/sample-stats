@@ -28,20 +28,14 @@
 
 ### High Priority
 
-- [ ] **TypeScript strictness** - Use discriminated unions for parameters to eliminate unsafe type assertions in lib/draw.ts:26-56
-  ```typescript
-  type DistributionConfig =
-    | { type: "normal"; params: ParamsNormal }
-    | { type: "uniform"; params: ParamsUniform }
-  // ...
-  ```
-- [ ] **Memory management** - Implement max sample limit or sliding window for unbounded samples array (app/page.tsx:38) to prevent memory issues
+- [x] **TypeScript strictness** - Use discriminated unions for parameters to eliminate unsafe type assertions in lib/draw.ts:26-56 ✅
+- [x] **Memory management** - Implement max sample limit or sliding window for unbounded samples array (app/page.tsx:38) to prevent memory issues ✅
 - [ ] **Stats calculation efficiency** - Cache results or use Web Workers for heavy computation in lib/utils.ts as samples grow large
-- [ ] **Console.log cleanup** - Remove debug log at app/page.tsx:72
+- [x] **Console.log cleanup** - Remove debug log at app/page.tsx:72 ✅
 
 ### Medium Priority
 
-- [ ] **Histogram binning algorithm** - Memoize histogram computation in components/graphs/histogram.tsx:10-45 using useMemo to avoid recalculating on every render
+- [x] **Histogram binning algorithm** - Memoize histogram computation in components/graphs/histogram.tsx:10-45 using useMemo to avoid recalculating on every render ✅
 - [ ] **Form ref pattern** - Refactor unconventional form submission via ref (app/page.tsx:46,71-75) to use lifted state or context
 - [ ] **Error boundaries** - Add error boundaries around histogram and form components for graceful edge case handling
 - [ ] **Accessibility** - Add ARIA labels for play/pause button and form inputs; add descriptive text alternative for histogram
