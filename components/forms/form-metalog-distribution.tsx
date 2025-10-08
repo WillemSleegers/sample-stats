@@ -27,11 +27,11 @@ import { DEFAULT_PARAMETERS } from "@/lib/constants"
 
 const formSchema = z
   .object({
-    p10: z.coerce.number(),
-    p50: z.coerce.number(),
-    p90: z.coerce.number(),
-    lower: z.coerce.number().optional(),
-    upper: z.coerce.number().optional(),
+    p10: z.coerce.number<number>(),
+    p50: z.coerce.number<number>(),
+    p90: z.coerce.number<number>(),
+    lower: z.coerce.number<number>().optional(),
+    upper: z.coerce.number<number>().optional(),
   })
   .refine(
     (data) => {
@@ -103,7 +103,9 @@ const FormMetalogDistribution = forwardRef<
               <FormControl>
                 <Input type="number" className="bg-background" {...field} />
               </FormControl>
-              <FormDescription>10% of values will be below this (must be &lt; p50)</FormDescription>
+              <FormDescription>
+                10% of values will be below this (must be &lt; p50)
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -117,7 +119,9 @@ const FormMetalogDistribution = forwardRef<
               <FormControl>
                 <Input type="number" className="bg-background" {...field} />
               </FormControl>
-              <FormDescription>Median value (must be between p10 and p90)</FormDescription>
+              <FormDescription>
+                Median value (must be between p10 and p90)
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -131,7 +135,9 @@ const FormMetalogDistribution = forwardRef<
               <FormControl>
                 <Input type="number" className="bg-background" {...field} />
               </FormControl>
-              <FormDescription>90% of values will be below this (must be &gt; p50)</FormDescription>
+              <FormDescription>
+                90% of values will be below this (must be &gt; p50)
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

@@ -27,7 +27,7 @@ export const Histogram = ({
   distribution,
   parameters,
 }: HistogramProps) => {
-  const { histogramData, pdfData, maxY } = useMemo(() => {
+  const { histogramData, maxY } = useMemo(() => {
     if (data.length === 0) return { histogramData: [], pdfData: [], maxY: 0 }
 
     const min = Math.min(...data)
@@ -54,9 +54,6 @@ export const Histogram = ({
       }
     })
 
-    // Calculate histogram density (for comparison with PDF)
-    const totalSamples = data.length
-
     // Create histogram bars - just use raw count for now
     const histogramBars: Array<{
       index: number
@@ -69,7 +66,7 @@ export const Histogram = ({
       count: bin.count,
     }))
 
-    let maxYValue = Math.max(...histogramBars.map((b) => b.count))
+    const maxYValue = Math.max(...histogramBars.map((b) => b.count))
 
     // Add PDF values to histogram bars if needed
     if (showPdf && distribution && parameters) {

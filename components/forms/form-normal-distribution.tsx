@@ -26,8 +26,8 @@ import { FormHandle, Parameters } from "@/lib/types"
 import { DEFAULT_PARAMETERS } from "@/lib/constants"
 
 const formSchema = z.object({
-  mean: z.coerce.number(),
-  sd: z.coerce.number(),
+  mean: z.coerce.number<number>(),
+  sd: z.coerce.number<number>(),
 })
 
 type FormNormalDistributionProps = {
@@ -83,7 +83,9 @@ const FormNormalDistribution = forwardRef<
               <FormControl>
                 <Input type="number" className="bg-background" {...field} />
               </FormControl>
-              <FormDescription>Spread of the distribution (must be &gt; 0)</FormDescription>
+              <FormDescription>
+                Spread of the distribution (must be &gt; 0)
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

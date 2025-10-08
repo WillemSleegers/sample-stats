@@ -27,9 +27,9 @@ import { DEFAULT_PARAMETERS } from "@/lib/constants"
 
 const formSchema = z
   .object({
-    min: z.coerce.number(),
-    mode: z.coerce.number(),
-    max: z.coerce.number(),
+    min: z.coerce.number<number>(),
+    mode: z.coerce.number<number>(),
+    max: z.coerce.number<number>(),
   })
   .refine((data) => data.min < data.mode, {
     message: "Minimum must be smaller than mode",
@@ -77,7 +77,9 @@ const FormPertDistribution = forwardRef<FormHandle, FormPertDistributionProps>(
                 <FormControl>
                   <Input type="number" className="bg-background" {...field} />
                 </FormControl>
-                <FormDescription>Minimum possible value (must be &lt; mode)</FormDescription>
+                <FormDescription>
+                  Minimum possible value (must be &lt; mode)
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -91,7 +93,9 @@ const FormPertDistribution = forwardRef<FormHandle, FormPertDistributionProps>(
                 <FormControl>
                   <Input type="number" className="bg-background" {...field} />
                 </FormControl>
-                <FormDescription>Most likely value (must be between min and max)</FormDescription>
+                <FormDescription>
+                  Most likely value (must be between min and max)
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -105,7 +109,9 @@ const FormPertDistribution = forwardRef<FormHandle, FormPertDistributionProps>(
                 <FormControl>
                   <Input type="number" className="bg-background" {...field} />
                 </FormControl>
-                <FormDescription>Maximum possible value (must be &gt; mode)</FormDescription>
+                <FormDescription>
+                  Maximum possible value (must be &gt; mode)
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

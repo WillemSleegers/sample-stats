@@ -26,8 +26,8 @@ import { FormHandle, Parameters } from "@/lib/types"
 import { DEFAULT_PARAMETERS } from "@/lib/constants"
 
 const formSchema = z.object({
-  min: z.coerce.number(),
-  max: z.coerce.number(),
+  min: z.coerce.number<number>(),
+  max: z.coerce.number<number>(),
 })
 
 type FormUniformDistributionProps = {

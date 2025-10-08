@@ -26,8 +26,8 @@ import { FormHandle, Parameters } from "@/lib/types"
 import { DEFAULT_PARAMETERS } from "@/lib/constants"
 
 const formSchema = z.object({
-  meanlog: z.coerce.number(),
-  sdlog: z.coerce.number(),
+  meanlog: z.coerce.number<number>(),
+  sdlog: z.coerce.number<number>(),
 })
 
 type FormLognormalDistributionProps = {
@@ -67,7 +67,9 @@ const FormLognormalDistribution = forwardRef<
               <FormControl>
                 <Input type="number" className="bg-background" {...field} />
               </FormControl>
-              <FormDescription>Mean of the underlying normal distribution</FormDescription>
+              <FormDescription>
+                Mean of the underlying normal distribution
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -81,7 +83,9 @@ const FormLognormalDistribution = forwardRef<
               <FormControl>
                 <Input type="number" className="bg-background" {...field} />
               </FormControl>
-              <FormDescription>Spread of the underlying normal distribution (must be &gt; 0)</FormDescription>
+              <FormDescription>
+                Spread of the underlying normal distribution (must be &gt; 0)
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

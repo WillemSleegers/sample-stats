@@ -26,8 +26,8 @@ import { FormHandle, Parameters } from "@/lib/types"
 import { DEFAULT_PARAMETERS } from "@/lib/constants"
 
 const formSchema = z.object({
-  alpha: z.coerce.number(),
-  beta: z.coerce.number(),
+  alpha: z.coerce.number<number>(),
+  beta: z.coerce.number<number>(),
 })
 
 type FormBetaDistributionProps = {
@@ -65,7 +65,9 @@ const FormBetaDistribution = forwardRef<FormHandle, FormBetaDistributionProps>(
                 <FormControl>
                   <Input type="number" className="bg-background" {...field} />
                 </FormControl>
-                <FormDescription>First shape parameter (must be &gt; 0)</FormDescription>
+                <FormDescription>
+                  First shape parameter (must be &gt; 0)
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -79,7 +81,9 @@ const FormBetaDistribution = forwardRef<FormHandle, FormBetaDistributionProps>(
                 <FormControl>
                   <Input type="number" className="bg-background" {...field} />
                 </FormControl>
-                <FormDescription>Second shape parameter (must be &gt; 0)</FormDescription>
+                <FormDescription>
+                  Second shape parameter (must be &gt; 0)
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
