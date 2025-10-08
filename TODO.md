@@ -22,7 +22,7 @@
 - [ ] **Remove focus line around graph** - There should not be a focus outline around the graph when the user clicks on the graph.
 - [ ] **Fix dropdown delayed appearance** - When the page first loads, the dropdown loads, but there's a delay in when the value of the dropdown shows up. The value 'Normal' only appears a second or so after the page loads.
 - [ ] **Improve the look of the title** - Currently the title consist of a large title with a subtitle. The subtitle doesn't look particularly nice. Re-evaluate the title and subtitle to see if we those can better match modern aesthetics.
-- [x] **Add new Shadcn components** - Shadcn released new components, one of them is a Field component (https://ui.shadcn.com/docs/components/field) which I think we can use in our sidebar. Maybe also on the main page with the distribution dropdown and sample button. ✅
+- [ ] **Add new Shadcn components** - Shadcn released new components, one of them is a Field component (https://ui.shadcn.com/docs/components/field) which I think we can use in our sidebar. Maybe also on the main page with the distribution dropdown and sample button.
 
 ## Codebase Improvements
 
@@ -43,9 +43,7 @@
 
 - [ ] **Histogram binning algorithm** - Memoize histogram computation in components/graphs/histogram.tsx:10-45 using useMemo to avoid recalculating on every render
 - [ ] **Form ref pattern** - Refactor unconventional form submission via ref (app/page.tsx:46,71-75) to use lifted state or context
-- [ ] **Constants organization** - Split lib/constants.ts into separate files for speed settings and default parameters
 - [ ] **Error boundaries** - Add error boundaries around histogram and form components for graceful edge case handling
-- [ ] **Testing** - Add unit tests for distribution functions and histogram binning logic
 - [ ] **Accessibility** - Add ARIA labels for play/pause button and form inputs; add descriptive text alternative for histogram
 
 ### Low Priority
