@@ -2,12 +2,7 @@
 
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import {
-  Dispatch,
-  forwardRef,
-  SetStateAction,
-  useImperativeHandle,
-} from "react"
+import { Dispatch, SetStateAction } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import {
@@ -20,24 +15,28 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
-import { FormHandle, Parameters } from "@/lib/types"
+import { Parameters } from "@/lib/types"
 
 import { DEFAULT_PARAMETERS } from "@/lib/constants"
 
 const formSchema = z.object({
   meanlog: z.coerce.number<number>(),
-  sdlog: z.coerce.number<number>(),
+  sdlog: z.coerce
+    .number<number>()
+    .positive("Standard deviation must be positive"),
 })
 
 type FormLognormalDistributionProps = {
   setParams: Dispatch<SetStateAction<Parameters>>
+  onUpdate: () => void
 }
 
-const FormLognormalDistribution = forwardRef<
-  FormHandle,
-  FormLognormalDistributionProps
->(({ setParams }, ref) => {
+const FormLognormalDistribution = ({
+  setParams,
+  onUpdate,
+}: FormLognormalDistributionProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,15 +45,11 @@ const FormLognormalDistribution = forwardRef<
     },
   })
 
-  useImperativeHandle(ref, () => ({
-    submitForm: () => {
-      form.handleSubmit(onSubmit)()
-    },
-  }))
-
   function onSubmit(values: z.infer<typeof formSchema>) {
     setParams({ type: "lognormal", ...values })
+    onUpdate()
   }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
@@ -90,11 +85,12 @@ const FormLognormalDistribution = forwardRef<
             </FormItem>
           )}
         />
+        <Button type="submit" className="w-full">
+          Update Parameters
+        </Button>
       </form>
     </Form>
   )
-})
-
-FormLognormalDistribution.displayName = "FormLognormalDistribution"
+}
 
 export default FormLognormalDistribution

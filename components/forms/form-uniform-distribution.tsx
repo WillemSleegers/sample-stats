@@ -2,12 +2,7 @@
 
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import {
-  Dispatch,
-  forwardRef,
-  SetStateAction,
-  useImperativeHandle,
-} from "react"
+import { Dispatch, SetStateAction } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import {
@@ -20,24 +15,31 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
-import { FormHandle, Parameters } from "@/lib/types"
+import { Parameters } from "@/lib/types"
 
 import { DEFAULT_PARAMETERS } from "@/lib/constants"
 
-const formSchema = z.object({
-  min: z.coerce.number<number>(),
-  max: z.coerce.number<number>(),
-})
+const formSchema = z
+  .object({
+    min: z.coerce.number<number>(),
+    max: z.coerce.number<number>(),
+  })
+  .refine((data) => data.min < data.max, {
+    message: "Minimum must be less than maximum",
+    path: ["max"],
+  })
 
 type FormUniformDistributionProps = {
   setParams: Dispatch<SetStateAction<Parameters>>
+  onUpdate: () => void
 }
 
-const FormUniformDistribution = forwardRef<
-  FormHandle,
-  FormUniformDistributionProps
->(({ setParams }, ref) => {
+const FormUniformDistribution = ({
+  setParams,
+  onUpdate,
+}: FormUniformDistributionProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,14 +48,9 @@ const FormUniformDistribution = forwardRef<
     },
   })
 
-  useImperativeHandle(ref, () => ({
-    submitForm: () => {
-      form.handleSubmit(onSubmit)()
-    },
-  }))
-
   function onSubmit(values: z.infer<typeof formSchema>) {
     setParams({ type: "uniform", ...values })
+    onUpdate()
   }
 
   return (
@@ -87,11 +84,12 @@ const FormUniformDistribution = forwardRef<
             </FormItem>
           )}
         />
+        <Button type="submit" className="w-full">
+          Update Parameters
+        </Button>
       </form>
     </Form>
   )
-})
+}
 
 export default FormUniformDistribution
-
-FormUniformDistribution.displayName = "FormUniformDistribution"

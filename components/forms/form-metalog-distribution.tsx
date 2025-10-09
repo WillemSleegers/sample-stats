@@ -2,12 +2,7 @@
 
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import {
-  Dispatch,
-  forwardRef,
-  SetStateAction,
-  useImperativeHandle,
-} from "react"
+import { Dispatch, SetStateAction } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import {
@@ -20,8 +15,9 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
-import { FormHandle, Parameters } from "@/lib/types"
+import { Parameters } from "@/lib/types"
 
 import { DEFAULT_PARAMETERS } from "@/lib/constants"
 
@@ -66,12 +62,13 @@ const formSchema = z
 
 type FormMetalogDistributionProps = {
   setParams: Dispatch<SetStateAction<Parameters>>
+  onUpdate: () => void
 }
 
-const FormMetalogDistribution = forwardRef<
-  FormHandle,
-  FormMetalogDistributionProps
->(({ setParams }, ref) => {
+const FormMetalogDistribution = ({
+  setParams,
+  onUpdate,
+}: FormMetalogDistributionProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -81,14 +78,9 @@ const FormMetalogDistribution = forwardRef<
     },
   })
 
-  useImperativeHandle(ref, () => ({
-    submitForm: () => {
-      form.handleSubmit(onSubmit)()
-    },
-  }))
-
   function onSubmit(values: z.infer<typeof formSchema>) {
     setParams({ type: "metalog", ...values })
+    onUpdate()
   }
 
   return (
@@ -180,11 +172,12 @@ const FormMetalogDistribution = forwardRef<
             </FormItem>
           )}
         />
+        <Button type="submit" className="w-full">
+          Update Parameters
+        </Button>
       </form>
     </Form>
   )
-})
+}
 
 export default FormMetalogDistribution
-
-FormMetalogDistribution.displayName = "FormMetalogDistribution"

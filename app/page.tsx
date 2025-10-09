@@ -19,7 +19,6 @@ import { DEFAULT_PARAMETERS, SPEED_SETTINGS, MAX_SAMPLES } from "@/lib/constants
 
 import {
   Distribution,
-  FormHandle,
   Parameters,
   SpeedSetting,
   Stats,
@@ -46,7 +45,6 @@ const App = () => {
   const samplingIntervalRef = useRef<ReturnType<typeof setInterval>>(null)
   const statsIntervalRef = useRef<ReturnType<typeof setInterval>>(null)
   const samplesRef = useRef<number[]>([])
-  const formRef = useRef<FormHandle>(null)
 
   // Full screen
   const [fullScreenEnabled, setFullScreenEnabled] = useState(true)
@@ -61,7 +59,7 @@ const App = () => {
   useEffect(() => {
     setIsSampling(false)
     setSamples([]) // Clear samples
-    setParameters(DEFAULT_PARAMETERS[distribution]) // Set default parameters
+    setParameters(DEFAULT_PARAMETERS[distribution])
   }, [distribution])
 
   // On samples change
@@ -71,9 +69,6 @@ const App = () => {
 
   // Event handlers
   const handleClick = () => {
-    if (formRef.current) {
-      formRef.current.submitForm()
-    }
     setIsSampling((prev) => !prev)
   }
 
@@ -81,6 +76,12 @@ const App = () => {
     setIsSampling(false)
     setSamples([])
     setStats({})
+  }
+
+  const handleUpdateParameters = () => {
+    setSamples([])
+    setStats({})
+    setIsSampling(false)
   }
 
   const updateStats = useCallback(() => {
@@ -169,10 +170,9 @@ const App = () => {
   return (
     <SidebarProvider defaultOpen={false}>
       <AppSidebar
-        ref={formRef}
         distribution={distribution}
-        params={parameters}
         setParams={setParameters}
+        onUpdateParameters={handleUpdateParameters}
         setSpeed={setSpeed}
         setShowStats={setShowStats}
         binCount={binCount}

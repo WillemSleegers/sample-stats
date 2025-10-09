@@ -2,12 +2,7 @@
 
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import {
-  Dispatch,
-  forwardRef,
-  SetStateAction,
-  useImperativeHandle,
-} from "react"
+import { Dispatch, SetStateAction } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import {
@@ -20,8 +15,9 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
-import { FormHandle, Parameters } from "@/lib/types"
+import { Parameters } from "@/lib/types"
 
 import { DEFAULT_PARAMETERS } from "@/lib/constants"
 
@@ -42,86 +38,84 @@ const formSchema = z
 
 type FormPertDistributionProps = {
   setParams: Dispatch<SetStateAction<Parameters>>
+  onUpdate: () => void
 }
 
-const FormPertDistribution = forwardRef<FormHandle, FormPertDistributionProps>(
-  ({ setParams }, ref) => {
-    const form = useForm<z.infer<typeof formSchema>>({
-      resolver: zodResolver(formSchema),
-      defaultValues: {
-        min: DEFAULT_PARAMETERS.pert.min,
-        mode: DEFAULT_PARAMETERS.pert.mode,
-        max: DEFAULT_PARAMETERS.pert.max,
-      },
-    })
+const FormPertDistribution = ({
+  setParams,
+  onUpdate,
+}: FormPertDistributionProps) => {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      min: DEFAULT_PARAMETERS.pert.min,
+      mode: DEFAULT_PARAMETERS.pert.mode,
+      max: DEFAULT_PARAMETERS.pert.max,
+    },
+  })
 
-    useImperativeHandle(ref, () => ({
-      submitForm: () => {
-        form.handleSubmit(onSubmit)()
-      },
-    }))
-
-    function onSubmit(values: z.infer<typeof formSchema>) {
-      setParams({ type: "pert", ...values })
-    }
-
-    return (
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-          <FormField
-            control={form.control}
-            name="min"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Minimum</FormLabel>
-                <FormControl>
-                  <Input type="number" className="bg-background" {...field} />
-                </FormControl>
-                <FormDescription>
-                  Minimum possible value (must be &lt; mode)
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="mode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Mode</FormLabel>
-                <FormControl>
-                  <Input type="number" className="bg-background" {...field} />
-                </FormControl>
-                <FormDescription>
-                  Most likely value (must be between min and max)
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="max"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Maximum</FormLabel>
-                <FormControl>
-                  <Input type="number" className="bg-background" {...field} />
-                </FormControl>
-                <FormDescription>
-                  Maximum possible value (must be &gt; mode)
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </form>
-      </Form>
-    )
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    setParams({ type: "pert", ...values })
+    onUpdate()
   }
-)
 
-FormPertDistribution.displayName = "FormPertDistribution"
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+        <FormField
+          control={form.control}
+          name="min"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Minimum</FormLabel>
+              <FormControl>
+                <Input type="number" className="bg-background" {...field} />
+              </FormControl>
+              <FormDescription>
+                Minimum possible value (must be &lt; mode)
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="mode"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Mode</FormLabel>
+              <FormControl>
+                <Input type="number" className="bg-background" {...field} />
+              </FormControl>
+              <FormDescription>
+                Most likely value (must be between min and max)
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="max"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Maximum</FormLabel>
+              <FormControl>
+                <Input type="number" className="bg-background" {...field} />
+              </FormControl>
+              <FormDescription>
+                Maximum possible value (must be &gt; mode)
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full">
+          Update Parameters
+        </Button>
+      </form>
+    </Form>
+  )
+}
 
 export default FormPertDistribution
