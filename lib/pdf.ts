@@ -5,6 +5,7 @@ import {
   ParamsUniform,
   ParamsBeta,
   ParamsPert,
+  ParamsMetalog,
 } from "./types"
 
 // Helper function for gamma function (approximation)
@@ -88,6 +89,136 @@ function pertPdf(x: number, params: ParamsPert): number {
   return pdfValue / range
 }
 
+// Metalog distribution quantile function
+function metalogQuantile(p: number, params: ParamsMetalog): number {
+  const { p10, p50, p90, lower, upper } = params
+
+  // Create quantile pairs
+  const quantilePairs = [
+    { p: 0.1, x: p10 },
+    { p: 0.5, x: p50 },
+    { p: 0.9, x: p90 }
+  ]
+
+  // Sort quantile pairs by probability
+  const sortedPairs = [...quantilePairs].sort((a, b) => a.p - b.p)
+
+  // Determine boundedness and transform variables
+  let boundedness: "u" | "sl" | "su" | "b" = "u"
+  let lowerBound = -Infinity
+  let upperBound = Infinity
+
+  if (lower !== undefined && upper !== undefined) {
+    boundedness = "b"
+    lowerBound = lower
+    upperBound = upper
+  } else if (lower !== undefined) {
+    boundedness = "sl"
+    lowerBound = lower
+  } else if (upper !== undefined) {
+    boundedness = "su"
+    upperBound = upper
+  }
+
+  // Build Y matrix for the quantile pairs
+  const Y = sortedPairs.map((pair) => {
+    const prob = pair.p
+    const logit = Math.log(prob / (1 - prob))
+    return [1, logit, (prob - 0.5) * logit]
+  })
+
+  // Transform x values based on boundedness
+  const z = sortedPairs.map((pair) => {
+    const x = pair.x
+    switch (boundedness) {
+      case "sl":
+        return Math.log(x - lowerBound)
+      case "su":
+        return -Math.log(upperBound - x)
+      case "b":
+        return Math.log((x - lowerBound) / (upperBound - x))
+      default:
+        return x
+    }
+  })
+
+  // Solve for parameters using linear algebra
+  const det = (m: number[][]) =>
+    m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
+    m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) +
+    m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0])
+
+  const detA = det(Y)
+  const a = new Array(3).fill(0).map((_, i) => {
+    const Yi = Y.map((row, j) => row.map((val, k) => (k === i ? z[j] : val)))
+    return det(Yi) / detA
+  })
+
+  // Calculate quantile for given probability p
+  const logit = Math.log(p / (1 - p))
+  const y2 = logit
+  const y3 = (p - 0.5) * logit
+
+  const s = a[0] + a[1] * y2 + a[2] * y3
+
+  // Transform back based on boundedness
+  switch (boundedness) {
+    case "sl":
+      return lowerBound + Math.exp(s)
+    case "su":
+      return upperBound - Math.exp(-s)
+    case "b":
+      return (lowerBound + upperBound * Math.exp(s)) / (1 + Math.exp(s))
+    default:
+      return s
+  }
+}
+
+// Metalog distribution PDF using numerical differentiation
+function metalogPdf(x: number, params: ParamsMetalog): number {
+  const { lower, upper } = params
+
+  // Check bounds
+  if (lower !== undefined && x <= lower) return 0
+  if (upper !== undefined && x >= upper) return 0
+
+  // Use numerical differentiation to find PDF from quantile function
+  // PDF(x) = 1 / (d/dp Q(p)) where Q(p) is the quantile function
+
+  // First, we need to find p such that Q(p) ≈ x
+  // Use binary search to find the probability p corresponding to x
+  let pLow = 0.001
+  let pHigh = 0.999
+  let p = 0.5
+  const tolerance = 1e-6
+  const maxIterations = 50
+
+  for (let i = 0; i < maxIterations; i++) {
+    const qp = metalogQuantile(p, params)
+    if (Math.abs(qp - x) < tolerance) break
+
+    if (qp < x) {
+      pLow = p
+    } else {
+      pHigh = p
+    }
+    p = (pLow + pHigh) / 2
+  }
+
+  // Now compute the derivative dQ/dp using numerical differentiation
+  const h = 0.001 // Small step for numerical differentiation
+  const pPlus = Math.min(0.999, p + h)
+  const pMinus = Math.max(0.001, p - h)
+
+  const qPlus = metalogQuantile(pPlus, params)
+  const qMinus = metalogQuantile(pMinus, params)
+
+  const dQdp = (qPlus - qMinus) / (pPlus - pMinus)
+
+  // PDF = 1 / (dQ/dp)
+  return dQdp > 0 ? 1 / dQdp : 0
+}
+
 // Main PDF function
 export function calculatePdf(x: number, params: Parameters): number {
   switch (params.type) {
@@ -102,8 +233,7 @@ export function calculatePdf(x: number, params: Parameters): number {
     case "pert":
       return pertPdf(x, params)
     case "metalog":
-      // Metalog doesn't have a simple closed-form PDF
-      return 0
+      return metalogPdf(x, params)
   }
 }
 
