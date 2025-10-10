@@ -23,7 +23,7 @@ import {
   SpeedSetting,
   Stats,
 } from "@/lib/types"
-import { max, mean, min, quantile } from "@/lib/utils"
+import { calculateAllStats } from "@/lib/utils"
 import { StatisticsSummary } from "@/components/statistics"
 
 const App = () => {
@@ -86,16 +86,10 @@ const App = () => {
 
   const updateStats = useCallback(() => {
     const currentSamples = samplesRef.current
-    const quantiles = quantile(currentSamples, [0.1, 0.5, 0.9])
+    if (currentSamples.length === 0) return
 
-    const newStats = {
-      p10: quantiles[0],
-      p50: quantiles[1],
-      p90: quantiles[2],
-      min: min(currentSamples),
-      max: max(currentSamples),
-      mean: mean(currentSamples),
-    }
+    // Use optimized single-pass calculation
+    const newStats = calculateAllStats(currentSamples)
 
     // Set new stats, if one of them has changed
     setStats((prevStats) => {

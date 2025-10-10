@@ -48,3 +48,46 @@ export const quantile = (
     }
   })
 }
+
+// Optimized single-pass statistics calculation
+// Assumes x.length > 0 (caller should check before calling)
+export const calculateAllStats = (x: number[]) => {
+  // First pass for min, max, and sum
+  let minVal = x[0]
+  let maxVal = x[0]
+  let sum = 0
+
+  for (let i = 0; i < x.length; i++) {
+    const val = x[i]
+    sum += val
+    if (val < minVal) minVal = val
+    if (val > maxVal) maxVal = val
+  }
+
+  const meanVal = sum / x.length
+
+  // Second pass for variance calculation
+  let sumSquaredDiffs = 0
+  for (let i = 0; i < x.length; i++) {
+    const diff = x[i] - meanVal
+    sumSquaredDiffs += diff * diff
+  }
+
+  const variance = sumSquaredDiffs / x.length
+  const stdDev = Math.sqrt(variance)
+
+  // Calculate quantiles (still requires sorting, but only once)
+  const quantiles = quantile(x, [0.1, 0.5, 0.9], "linear")
+
+  return {
+    min: minVal,
+    max: maxVal,
+    mean: meanVal,
+    variance: variance,
+    stdDev: stdDev,
+    p10: quantiles[0],
+    p50: quantiles[1],
+    p90: quantiles[2],
+  }
+}
+

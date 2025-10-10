@@ -9,14 +9,39 @@ export const StatisticsSummary = ({ stats }: StatisticsSummaryProps) => {
     <div className="max-w-2xl mx-auto space-y-4">
       <h3 className="text-lg font-semibold text-center">Summary Statistics</h3>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        <StatCard label="Mean" value={stats.mean} />
-        <StatCard label="Min" value={stats.min} />
-        <StatCard label="Max" value={stats.max} />
-        <StatCard label="P10" value={stats.p10} />
-        <StatCard label="Median" value={stats.p50} />
-        <StatCard label="P90" value={stats.p90} />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {/* Central Tendency */}
+        <StatGroup>
+          <StatCard label="Mean" value={stats.mean} />
+          <StatCard label="Median" value={stats.p50} />
+        </StatGroup>
+
+        {/* Variability */}
+        <StatGroup>
+          <StatCard label="Std Dev" value={stats.stdDev} />
+          <StatCard label="Variance" value={stats.variance} />
+        </StatGroup>
+
+        {/* Range */}
+        <StatGroup>
+          <StatCard label="Min" value={stats.min} />
+          <StatCard label="Max" value={stats.max} />
+        </StatGroup>
+
+        {/* Percentiles */}
+        <StatGroup>
+          <StatCard label="P10" value={stats.p10} />
+          <StatCard label="P90" value={stats.p90} />
+        </StatGroup>
       </div>
+    </div>
+  )
+}
+
+function StatGroup({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="space-y-2">
+      {children}
     </div>
   )
 }

@@ -59,6 +59,8 @@ export type Stats = {
   min?: number
   max?: number
   mean?: number
+  variance?: number
+  stdDev?: number
 }
 
 export type SpeedSetting = keyof typeof SPEED_SETTINGS
