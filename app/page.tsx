@@ -190,6 +190,7 @@ const App = () => {
                 size="icon"
                 variant="ghost"
                 onClick={fullScreenHandle.enter}
+                aria-label="Enter fullscreen mode"
               >
                 <FullscreenIcon />
               </Button>
@@ -205,7 +206,11 @@ const App = () => {
               setDistribution={setDistribution}
             />
             <div className="flex flex-row gap-2">
-              <Button className="w-32 justify-start" onClick={handleClick}>
+              <Button
+                className="w-32 justify-start"
+                onClick={handleClick}
+                aria-label={isSampling ? "Pause sampling" : "Start sampling from distribution"}
+              >
                 <div className="w-4 h-4 mr-2">
                   {isSampling ? (
                     <PauseIcon className="h-4 w-4" />
@@ -220,6 +225,7 @@ const App = () => {
                 size="icon"
                 onClick={handleClear}
                 disabled={samples.length === 0}
+                aria-label="Clear all samples"
               >
                 <RotateCcwIcon className="h-4 w-4" />
               </Button>
@@ -236,13 +242,18 @@ const App = () => {
             handle={fullScreenHandle}
             className="h-[400px] max-w-[600px] mx-auto outline-none"
           >
-            <Histogram
-              data={samples}
-              binCount={useSturges ? Math.ceil(Math.log2(samples.length) + 1) : binCount}
-              animationDuration={SPEED_SETTINGS[speed].animationDuration}
-              showPdf={showPdf}
-              parameters={parameters}
-            />
+            <div
+              role="img"
+              aria-label={`Histogram showing ${samples.length.toLocaleString()} samples from ${distribution} distribution${showPdf ? ' with theoretical probability density curve overlay' : ''}`}
+            >
+              <Histogram
+                data={samples}
+                binCount={useSturges ? Math.ceil(Math.log2(samples.length) + 1) : binCount}
+                animationDuration={SPEED_SETTINGS[speed].animationDuration}
+                showPdf={showPdf}
+                parameters={parameters}
+              />
+            </div>
           </FullScreen>
 
           {showStats && <StatisticsSummary stats={stats} />}

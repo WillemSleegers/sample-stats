@@ -1,12 +1,12 @@
 import { useMemo } from "react"
 import {
   Bar,
-  ResponsiveContainer,
   Line,
   ComposedChart,
   YAxis,
   XAxis,
 } from "recharts"
+import { ChartContainer } from "@/components/ui/chart"
 import { Parameters } from "@/lib/types"
 import { generatePdfCurve } from "@/lib/pdf"
 
@@ -95,11 +95,21 @@ export const Histogram = ({
     return null
   }
 
+  const chartConfig = {
+    count: {
+      label: "Count",
+      color: "hsl(var(--chart-1))",
+    },
+    pdf: {
+      label: "Theoretical curve",
+      color: "hsl(var(--chart-2))",
+    },
+  }
+
   return (
-    <ResponsiveContainer
-      width="100%"
-      height="100%"
-      className="bg-background outline-none [&_svg]:outline-none [&_svg]:focus:outline-none"
+    <ChartContainer
+      config={chartConfig}
+      className="h-full w-full bg-background outline-none [&_svg]:outline-none [&_svg]:focus:outline-none"
     >
       <ComposedChart data={chartData} barCategoryGap="5%">
         <XAxis dataKey="index" hide />
@@ -108,7 +118,7 @@ export const Histogram = ({
           <Line
             type="natural"
             dataKey="pdf"
-            stroke="hsl(var(--secondary))"
+            stroke="var(--color-pdf)"
             strokeWidth={3}
             dot={false}
             isAnimationActive={false}
@@ -118,11 +128,11 @@ export const Histogram = ({
         )}
         <Bar
           dataKey="count"
-          fill="#16a34a"
+          fill="var(--color-count)"
           animationDuration={animationDuration}
           animationEasing="ease-in-out"
         />
       </ComposedChart>
-    </ResponsiveContainer>
+    </ChartContainer>
   )
 }

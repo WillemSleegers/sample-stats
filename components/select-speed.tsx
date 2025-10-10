@@ -14,7 +14,7 @@ type SelectSpeedProps = {
   setSpeed: Dispatch<SetStateAction<SpeedSetting>>
 }
 
-export const SelectSpeed = ({ speed, setSpeed }: SelectSpeedProps) => {
+const SelectSpeed = ({ speed, setSpeed }: SelectSpeedProps) => {
   const handleValueChange = (value: string) => {
     setSpeed(value as SpeedSetting)
   }
@@ -36,3 +36,5 @@ export const SelectSpeed = ({ speed, setSpeed }: SelectSpeedProps) => {
     </div>
   )
 }
+
+export default SelectSpeed

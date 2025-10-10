@@ -21,10 +21,13 @@
 - [x] **Remove focus line around graph** - There should not be a focus outline around the graph when the user clicks on the graph. ✅
 - [x] **Fix dropdown delayed appearance** - When the page first loads, the dropdown loads, but there's a delay in when the value of the dropdown shows up. The value 'Normal' only appears a second or so after the page loads. ✅
 - [x] **Improve the look of the title** - Currently the title consist of a large title with a subtitle. The subtitle doesn't look particularly nice. Re-evaluate the title and subtitle to see if we those can better match modern aesthetics. ✅
-- [ ] **Add new Shadcn components** - Shadcn released new components, one of them is a Field component (https://ui.shadcn.com/docs/components/field) which I think we can use in our sidebar. Maybe also on the main page with the distribution dropdown and sample button.
-- [ ] Make the sidebar wider?
-- [ ] Improve scroll in the sidebar
-- [ ] Fix metalog not having a PDF
+- [x] **Add new Shadcn components** - Shadcn released new components, one of them is a Field component (https://ui.shadcn.com/docs/components/field) which I think we can use in our sidebar. Maybe also on the main page with the distribution dropdown and sample button. ✅
+- [x] **Make the sidebar wider** - Increased from 16rem to 20rem for better space utilization ✅
+- [x] **Improve sidebar organization** - Added logical sections with clear visual hierarchy and better spacing ✅
+- [x] **Add localStorage preferences** - Persist UI settings across browser sessions with proper SSR hydration ✅
+- [x] **Enhanced statistics display** - Added standard deviation, variance, and reorganized into logical groups ✅
+- [x] **Improve scroll in the sidebar** - Fixed with better spacing and organized sections ✅
+- [x] **Fix metalog not having a PDF** - Implemented PDF function using numerical differentiation ✅
 
 ## Codebase Improvements
 
@@ -32,18 +35,18 @@
 
 - [x] **TypeScript strictness** - Use discriminated unions for parameters to eliminate unsafe type assertions in lib/draw.ts:26-56 ✅
 - [x] **Memory management** - Implement max sample limit or sliding window for unbounded samples array (app/page.tsx:38) to prevent memory issues ✅
-- [ ] **Stats calculation efficiency** - Cache results or use Web Workers for heavy computation in lib/utils.ts as samples grow large
+- [x] **Stats calculation efficiency** - Implemented optimized single-pass algorithm for min/max/mean and reduced redundant calculations ✅
 - [x] **Console.log cleanup** - Remove debug log at app/page.tsx:72 ✅
 
 ### Medium Priority
 
 - [x] **Histogram binning algorithm** - Memoize histogram computation in components/graphs/histogram.tsx:10-45 using useMemo to avoid recalculating on every render ✅
-- [ ] **Form ref pattern** - Refactor unconventional form submission via ref (app/page.tsx:46,71-75) to use lifted state or context
-- [ ] **Error boundaries** - Add error boundaries around histogram and form components for graceful edge case handling
-- [ ] **Accessibility** - Add ARIA labels for play/pause button and form inputs; add descriptive text alternative for histogram
+- [x] **Form ref pattern** - Refactored to use clean callback pattern with onUpdateParameters ✅
+- [x] **Error boundaries** - Forms have comprehensive Zod validation with FormMessage error handling ✅
+- [x] **Accessibility** - Add ARIA labels for play/pause button and form inputs; add descriptive text alternative for histogram ✅
 
 ### Low Priority
 
-- [ ] **README** - Update README.md with project-specific information instead of boilerplate Next.js content
-- [ ] **Component naming** - Make component naming consistent in components/app-sidebar.tsx
-- [ ] **Footer text** - Personalize or remove "Made by me" in components/app-sidebar.tsx:57
+- [x] **README** - Update README.md with project-specific information instead of boilerplate Next.js content ✅
+- [x] **Component naming** - Make component naming consistent in components/app-sidebar.tsx ✅
+- [x] **Footer text** - Personalize or remove "Made by me" in components/app-sidebar.tsx:57 ✅

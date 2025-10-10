@@ -6,10 +6,11 @@ import {
 import { Distribution, Parameters, SpeedSetting } from "@/lib/types"
 import FormDistribution from "./forms/form-distributions"
 import { Dispatch, SetStateAction } from "react"
-import { SelectSpeed } from "./select-speed"
+import SelectSpeed from "./select-speed"
 import { Switch } from "./ui/switch"
 import { Label } from "./ui/label"
 import { Input } from "./ui/input"
+import { FieldGroup, FieldTitle, FieldDescription } from "./ui/field"
 
 type AppSidebarProps = {
   distribution: Distribution
@@ -33,99 +34,93 @@ export const AppSidebar = ({ distribution, setParams, onUpdateParameters, speed,
       <SidebarHeader className="font-semibold text-lg px-6 py-4 border-b">
         Settings
       </SidebarHeader>
-      <SidebarContent className="px-6 py-4 space-y-8">
-        {/* Distribution Parameters Section */}
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <div className="font-semibold text-base">Parameters</div>
-            <div className="text-muted-foreground text-sm">
+      <SidebarContent className="px-6 py-4">
+        <FieldGroup>
+          {/* Distribution Parameters Section */}
+          <FieldGroup>
+            <FieldTitle>Parameters</FieldTitle>
+            <FieldDescription>
               Set the parameters to shape the distribution
-            </div>
-          </div>
-          <FormDistribution
-            distribution={distribution}
-            setParams={setParams}
-            onUpdate={onUpdateParameters}
-          />
-        </div>
+            </FieldDescription>
+            <FormDistribution
+              distribution={distribution}
+              setParams={setParams}
+              onUpdate={onUpdateParameters}
+            />
+          </FieldGroup>
 
-        {/* Visualization Settings Section */}
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <div className="font-semibold text-base">Visualization</div>
-            <div className="text-muted-foreground text-sm">
+          {/* Visualization Settings Section */}
+          <FieldGroup>
+            <FieldTitle>Visualization</FieldTitle>
+            <FieldDescription>
               Configure how data is displayed
-            </div>
-          </div>
+            </FieldDescription>
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="showStats" className="text-sm font-medium">Show statistics</Label>
-              <Switch
-                id="showStats"
-                checked={showStats}
-                onCheckedChange={() => {
-                  setShowStats((prev) => !prev)
-                }}
-              />
-            </div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="showStats" className="text-sm font-medium">Show statistics</Label>
+                <Switch
+                  id="showStats"
+                  checked={showStats}
+                  onCheckedChange={() => {
+                    setShowStats((prev) => !prev)
+                  }}
+                />
+              </div>
 
-            <div className="flex items-center justify-between">
-              <Label htmlFor="showPdf" className="text-sm font-medium">Show theoretical curve</Label>
-              <Switch
-                id="showPdf"
-                checked={showPdf}
-                onCheckedChange={setShowPdf}
-              />
+              <div className="flex items-center justify-between">
+                <Label htmlFor="showPdf" className="text-sm font-medium">Show theoretical curve</Label>
+                <Switch
+                  id="showPdf"
+                  checked={showPdf}
+                  onCheckedChange={setShowPdf}
+                />
+              </div>
             </div>
-          </div>
-        </div>
+          </FieldGroup>
 
-        {/* Histogram Settings Section */}
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <div className="font-semibold text-base">Histogram</div>
-            <div className="text-muted-foreground text-sm">
+          {/* Histogram Settings Section */}
+          <FieldGroup>
+            <FieldTitle>Histogram</FieldTitle>
+            <FieldDescription>
               Control histogram appearance
-            </div>
-          </div>
+            </FieldDescription>
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="useSturges" className="text-sm font-medium">Auto bin count</Label>
-              <Switch
-                id="useSturges"
-                checked={useSturges}
-                onCheckedChange={setUseSturges}
-              />
-            </div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="useSturges" className="text-sm font-medium">Auto bin count</Label>
+                <Switch
+                  id="useSturges"
+                  checked={useSturges}
+                  onCheckedChange={setUseSturges}
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="binCount" className="text-sm font-medium">Bin count</Label>
-              <Input
-                id="binCount"
-                type="number"
-                min={1}
-                max={100}
-                value={binCount}
-                onChange={(e) => setBinCount(Number(e.target.value))}
-                disabled={useSturges}
-                className="w-full"
-              />
+              <div className="space-y-2">
+                <Label htmlFor="binCount" className="text-sm font-medium">Bin count</Label>
+                <Input
+                  id="binCount"
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={binCount}
+                  onChange={(e) => setBinCount(Number(e.target.value))}
+                  disabled={useSturges}
+                  className="w-full"
+                />
+              </div>
             </div>
-          </div>
-        </div>
+          </FieldGroup>
 
-        {/* Sampling Settings Section */}
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <div className="font-semibold text-base">Sampling</div>
-            <div className="text-muted-foreground text-sm">
+          {/* Sampling Settings Section */}
+          <FieldGroup>
+            <FieldTitle>Sampling</FieldTitle>
+            <FieldDescription>
               Control sampling speed
-            </div>
-          </div>
-          <SelectSpeed speed={speed} setSpeed={setSpeed} />
-          </div>
+            </FieldDescription>
+            <SelectSpeed speed={speed} setSpeed={setSpeed} />
+          </FieldGroup>
+        </FieldGroup>
         </SidebarContent>
       </Sidebar>
     )
