@@ -13,7 +13,6 @@
 - [x] **Probability density overlay** - Overlay theoretical PDF curve on histogram to compare empirical vs theoretical distributions ✅
 - [x] **Clear samples button** - Add reset button to clear samples without changing distribution ✅
 - [x] **Parameter validation feedback** - Add helper text showing valid ranges (e.g., "SD must be positive") ✅
-- [ ] **Mobile responsiveness** - Make histogram height (app/page.tsx:189) responsive instead of fixed 400px
 
 ### Other Priority
 
@@ -23,6 +22,9 @@
 - [x] **Fix dropdown delayed appearance** - When the page first loads, the dropdown loads, but there's a delay in when the value of the dropdown shows up. The value 'Normal' only appears a second or so after the page loads. ✅
 - [x] **Improve the look of the title** - Currently the title consist of a large title with a subtitle. The subtitle doesn't look particularly nice. Re-evaluate the title and subtitle to see if we those can better match modern aesthetics. ✅
 - [ ] **Add new Shadcn components** - Shadcn released new components, one of them is a Field component (https://ui.shadcn.com/docs/components/field) which I think we can use in our sidebar. Maybe also on the main page with the distribution dropdown and sample button.
+- [ ] Make the sidebar wider?
+- [ ] Improve scroll in the sidebar
+- [ ] Fix metalog not having a PDF
 
 ## Codebase Improvements
 
