@@ -1,4 +1,3 @@
-import { useMemo } from "react"
 import {
   Bar,
   Line,
@@ -25,75 +24,65 @@ export const Histogram = ({
   showPdf = false,
   parameters,
 }: HistogramProps) => {
-  const { histogramData, maxY } = useMemo(() => {
-    if (data.length === 0) return { histogramData: [], pdfData: [], maxY: 0 }
-
-    const min = Math.min(...data)
-    const max = Math.max(...data)
-    const binWidth = (max - min) / binCount || 1 // Prevent division by zero
-
-    // Initialize bins with their ranges
-    const bins = Array(binCount)
-      .fill(0)
-      .map((_, i) => ({
-        binStart: min + i * binWidth,
-        binEnd: min + (i + 1) * binWidth,
-        count: 0,
-      }))
-
-    // Count samples in each bin
-    data.forEach((datum) => {
-      const binIndex = Math.min(
-        Math.floor((datum - min) / binWidth),
-        binCount - 1
-      )
-      if (binIndex >= 0 && binIndex < binCount) {
-        bins[binIndex].count++
-      }
-    })
-
-    // Create histogram bars - just use raw count for now
-    const histogramBars: Array<{
-      index: number
-      bin: string
-      count: number
-      pdf?: number
-    }> = bins.map((bin, index) => ({
-      index,
-      bin: `${bin.binStart.toFixed(1)} - ${bin.binEnd.toFixed(1)}`,
-      count: bin.count,
-    }))
-
-    const maxYValue = Math.max(...histogramBars.map((b) => b.count))
-
-    // Add PDF values to histogram bars if needed
-    if (showPdf && parameters) {
-      const pdfValues = bins.map((bin) => {
-        const x = (bin.binStart + bin.binEnd) / 2
-        return generatePdfCurve(x, x, parameters, 1)[0]?.y || 0
-      })
-
-      const maxPdf = Math.max(...pdfValues)
-      const scaleFactor = maxPdf > 0 ? maxYValue / maxPdf : 1
-
-      histogramBars.forEach((bar, i) => {
-        bar.pdf = pdfValues[i] * scaleFactor
-      })
-    }
-
-    return {
-      histogramData: histogramBars,
-      maxY: maxYValue,
-    }
-  }, [data, binCount, showPdf, parameters])
-
-  // Chart data is just the histogram data with optional PDF values
-  const chartData = histogramData
-
-  // Return null when there's no data to avoid rendering empty chart
+  // React Compiler will automatically memoize this computation
   if (data.length === 0) {
     return null
   }
+
+  const min = Math.min(...data)
+  const max = Math.max(...data)
+  const binWidth = (max - min) / binCount || 1 // Prevent division by zero
+
+  // Initialize bins with their ranges
+  const bins = Array(binCount)
+    .fill(0)
+    .map((_, i) => ({
+      binStart: min + i * binWidth,
+      binEnd: min + (i + 1) * binWidth,
+      count: 0,
+    }))
+
+  // Count samples in each bin
+  data.forEach((datum) => {
+    const binIndex = Math.min(
+      Math.floor((datum - min) / binWidth),
+      binCount - 1
+    )
+    if (binIndex >= 0 && binIndex < binCount) {
+      bins[binIndex].count++
+    }
+  })
+
+  // Create histogram bars - just use raw count for now
+  const histogramBars: Array<{
+    index: number
+    bin: string
+    count: number
+    pdf?: number
+  }> = bins.map((bin, index) => ({
+    index,
+    bin: `${bin.binStart.toFixed(1)} - ${bin.binEnd.toFixed(1)}`,
+    count: bin.count,
+  }))
+
+  const maxY = Math.max(...histogramBars.map((b) => b.count))
+
+  // Add PDF values to histogram bars if needed
+  if (showPdf && parameters) {
+    const pdfValues = bins.map((bin) => {
+      const x = (bin.binStart + bin.binEnd) / 2
+      return generatePdfCurve(x, x, parameters, 1)[0]?.y || 0
+    })
+
+    const maxPdf = Math.max(...pdfValues)
+    const scaleFactor = maxPdf > 0 ? maxY / maxPdf : 1
+
+    histogramBars.forEach((bar, i) => {
+      bar.pdf = pdfValues[i] * scaleFactor
+    })
+  }
+
+  const chartData = histogramBars
 
   const chartConfig = {
     count: {
