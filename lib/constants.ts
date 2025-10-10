@@ -5,7 +5,7 @@ export const SPEED_SETTINGS = {
   fastest: { interval: 50, n: 1, animationDuration: 0 },
 }
 
-export const MAX_SAMPLES = 100000 // Maximum number of samples to keep in memory
+export const MAX_SAMPLES = 10000 // Maximum number of samples to keep in memory
 
 export const DEFAULT_PARAMETERS = {
   normal: { type: "normal" as const, mean: 0, sd: 1 },
