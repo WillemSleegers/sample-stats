@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
+import useLocalStorage from "@/hooks/use-local-storage"
 import { FullScreen, useFullScreenHandle } from "react-full-screen"
 import { FullscreenIcon, PauseIcon, PlayIcon, RotateCcwIcon } from "lucide-react"
 
@@ -33,13 +34,16 @@ const App = () => {
     DEFAULT_PARAMETERS.normal
   )
   const [isSampling, setIsSampling] = useState(false)
-  const [speed, setSpeed] = useState<SpeedSetting>("normal")
   const [samples, setSamples] = useState<number[]>([])
   const [stats, setStats] = useState<Stats>({})
-  const [showStats, setShowStats] = useState(false)
-  const [binCount, setBinCount] = useState(10)
-  const [useSturges, setUseSturges] = useState(false)
-  const [showPdf, setShowPdf] = useState(false)
+  const [fullScreenEnabled, setFullScreenEnabled] = useState(true)
+
+  // Persisted UI Preferences
+  const [speed, setSpeed] = useLocalStorage<SpeedSetting>("speed", "normal")
+  const [showStats, setShowStats] = useLocalStorage<boolean>("showStats", false)
+  const [binCount, setBinCount] = useLocalStorage<number>("binCount", 10)
+  const [useSturges, setUseSturges] = useLocalStorage<boolean>("useSturges", false)
+  const [showPdf, setShowPdf] = useLocalStorage<boolean>("showPdf", false)
 
   // Refs
   const samplingIntervalRef = useRef<ReturnType<typeof setInterval>>(null)
@@ -47,7 +51,6 @@ const App = () => {
   const samplesRef = useRef<number[]>([])
 
   // Full screen
-  const [fullScreenEnabled, setFullScreenEnabled] = useState(true)
   const fullScreenHandle = useFullScreenHandle()
 
   // Setup
@@ -168,6 +171,7 @@ const App = () => {
         setParams={setParameters}
         onUpdateParameters={handleUpdateParameters}
         setSpeed={setSpeed}
+        showStats={showStats}
         setShowStats={setShowStats}
         binCount={binCount}
         setBinCount={setBinCount}

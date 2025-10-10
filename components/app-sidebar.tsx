@@ -17,6 +17,7 @@ type AppSidebarProps = {
   setParams: Dispatch<SetStateAction<Parameters>>
   onUpdateParameters: () => void
   setSpeed: Dispatch<SetStateAction<SpeedSetting>>
+  showStats: boolean
   setShowStats: Dispatch<SetStateAction<boolean>>
   binCount: number
   setBinCount: Dispatch<SetStateAction<number>>
@@ -26,7 +27,7 @@ type AppSidebarProps = {
   setShowPdf: Dispatch<SetStateAction<boolean>>
 }
 
-export const AppSidebar = ({ distribution, setParams, onUpdateParameters, setSpeed, setShowStats, binCount, setBinCount, useSturges, setUseSturges, showPdf, setShowPdf }: AppSidebarProps) => {
+export const AppSidebar = ({ distribution, setParams, onUpdateParameters, setSpeed, showStats, setShowStats, binCount, setBinCount, useSturges, setUseSturges, showPdf, setShowPdf }: AppSidebarProps) => {
   return (
     <Sidebar>
       <SidebarHeader className="font-semibold text-lg">
@@ -52,6 +53,7 @@ export const AppSidebar = ({ distribution, setParams, onUpdateParameters, setSpe
             <div className="flex items-center space-x-2">
               <Switch
                 id="showStats"
+                checked={showStats}
                 onCheckedChange={() => {
                   setShowStats((prev) => !prev)
                 }}
