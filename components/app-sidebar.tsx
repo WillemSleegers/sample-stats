@@ -1,7 +1,6 @@
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar"
 import { Distribution, Parameters, SpeedSetting } from "@/lib/types"
@@ -16,6 +15,7 @@ type AppSidebarProps = {
   distribution: Distribution
   setParams: Dispatch<SetStateAction<Parameters>>
   onUpdateParameters: () => void
+  speed: SpeedSetting
   setSpeed: Dispatch<SetStateAction<SpeedSetting>>
   showStats: boolean
   setShowStats: Dispatch<SetStateAction<boolean>>
@@ -27,15 +27,16 @@ type AppSidebarProps = {
   setShowPdf: Dispatch<SetStateAction<boolean>>
 }
 
-export const AppSidebar = ({ distribution, setParams, onUpdateParameters, setSpeed, showStats, setShowStats, binCount, setBinCount, useSturges, setUseSturges, showPdf, setShowPdf }: AppSidebarProps) => {
+export const AppSidebar = ({ distribution, setParams, onUpdateParameters, speed, setSpeed, showStats, setShowStats, binCount, setBinCount, useSturges, setUseSturges, showPdf, setShowPdf }: AppSidebarProps) => {
   return (
     <Sidebar>
-      <SidebarHeader className="font-semibold text-lg">
+      <SidebarHeader className="font-semibold text-lg px-6 py-4 border-b">
         Settings
       </SidebarHeader>
-      <SidebarContent className="p-4 space-y-2">
-        <div className="space-y-2">
-          <div>
+      <SidebarContent className="px-6 py-4 space-y-8">
+        {/* Distribution Parameters Section */}
+        <div className="space-y-4">
+          <div className="space-y-1">
             <div className="font-semibold text-base">Parameters</div>
             <div className="text-muted-foreground text-sm">
               Set the parameters to shape the distribution
@@ -47,10 +48,19 @@ export const AppSidebar = ({ distribution, setParams, onUpdateParameters, setSpe
             onUpdate={onUpdateParameters}
           />
         </div>
+
+        {/* Visualization Settings Section */}
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <div className="font-semibold text-base">Visualization</div>
+            <div className="text-muted-foreground text-sm">
+              Configure how data is displayed
+            </div>
+          </div>
+
           <div className="space-y-4">
-            <div className="font-semibold text-base">Additional settings</div>
-            <SelectSpeed setSpeed={setSpeed} />
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="showStats" className="text-sm font-medium">Show statistics</Label>
               <Switch
                 id="showStats"
                 checked={showStats}
@@ -58,41 +68,65 @@ export const AppSidebar = ({ distribution, setParams, onUpdateParameters, setSpe
                   setShowStats((prev) => !prev)
                 }}
               />
-              <Label htmlFor="showStats">Show statistics</Label>
             </div>
-            <div className="flex items-center space-x-2">
+
+            <div className="flex items-center justify-between">
+              <Label htmlFor="showPdf" className="text-sm font-medium">Show theoretical curve</Label>
               <Switch
                 id="showPdf"
                 checked={showPdf}
                 onCheckedChange={setShowPdf}
               />
-              <Label htmlFor="showPdf">Show probability density overlay</Label>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="useSturges"
-                  checked={useSturges}
-                  onCheckedChange={setUseSturges}
-                />
-                <Label htmlFor="useSturges">Use Sturges&apos; method</Label>
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="binCount">Bin count</Label>
-                <Input
-                  id="binCount"
-                  type="number"
-                  min={1}
-                  max={100}
-                  value={binCount}
-                  onChange={(e) => setBinCount(Number(e.target.value))}
-                  disabled={useSturges}
-                />
-              </div>
             </div>
           </div>
+        </div>
+
+        {/* Histogram Settings Section */}
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <div className="font-semibold text-base">Histogram</div>
+            <div className="text-muted-foreground text-sm">
+              Control histogram appearance
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="useSturges" className="text-sm font-medium">Auto bin count</Label>
+              <Switch
+                id="useSturges"
+                checked={useSturges}
+                onCheckedChange={setUseSturges}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="binCount" className="text-sm font-medium">Bin count</Label>
+              <Input
+                id="binCount"
+                type="number"
+                min={1}
+                max={100}
+                value={binCount}
+                onChange={(e) => setBinCount(Number(e.target.value))}
+                disabled={useSturges}
+                className="w-full"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Sampling Settings Section */}
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <div className="font-semibold text-base">Sampling</div>
+            <div className="text-muted-foreground text-sm">
+              Control sampling speed
+            </div>
+          </div>
+          <SelectSpeed speed={speed} setSpeed={setSpeed} />
+          </div>
         </SidebarContent>
-        <SidebarFooter className="text-sm">Made by me</SidebarFooter>
       </Sidebar>
     )
 }

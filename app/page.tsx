@@ -170,6 +170,7 @@ const App = () => {
         distribution={distribution}
         setParams={setParameters}
         onUpdateParameters={handleUpdateParameters}
+        speed={speed}
         setSpeed={setSpeed}
         showStats={showStats}
         setShowStats={setShowStats}
