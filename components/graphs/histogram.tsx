@@ -1,13 +1,16 @@
+import { useEffect, useState } from "react"
 import {
   Bar,
+  BarChart,
   Line,
-  ComposedChart,
+  LineChart,
   YAxis,
   XAxis,
 } from "recharts"
 import { ChartContainer } from "@/components/ui/chart"
 import { Parameters } from "@/lib/types"
-import { generatePdfCurve } from "@/lib/pdf"
+import { calculatePdfValues } from "@/lib/pdf"
+import { useWebR } from "@/hooks/use-webr"
 
 type HistogramProps = {
   data: number[]
@@ -24,65 +27,67 @@ export const Histogram = ({
   showPdf = false,
   parameters,
 }: HistogramProps) => {
-  // React Compiler will automatically memoize this computation
-  if (data.length === 0) {
-    return null
+  const { webR } = useWebR()
+  const [pdfValues, setPdfValues] = useState<number[]>([])
+
+  const hasData = data.length > 0
+
+  const min = hasData ? Math.min(...data) : 0
+  const max = hasData ? Math.max(...data) : 0
+  const binWidth = hasData ? (max - min) / binCount || 1 : 1
+
+  // Initialize and populate bins
+  const bins = hasData
+    ? Array(binCount)
+        .fill(0)
+        .map(() => 0)
+    : []
+
+  if (hasData) {
+    data.forEach((datum) => {
+      const binIndex = Math.min(
+        Math.floor((datum - min) / binWidth),
+        binCount - 1
+      )
+      if (binIndex >= 0 && binIndex < binCount) {
+        bins[binIndex]++
+      }
+    })
   }
 
-  const min = Math.min(...data)
-  const max = Math.max(...data)
-  const binWidth = (max - min) / binCount || 1 // Prevent division by zero
-
-  // Initialize bins with their ranges
-  const bins = Array(binCount)
-    .fill(0)
-    .map((_, i) => ({
-      binStart: min + i * binWidth,
-      binEnd: min + (i + 1) * binWidth,
-      count: 0,
-    }))
-
-  // Count samples in each bin
-  data.forEach((datum) => {
-    const binIndex = Math.min(
-      Math.floor((datum - min) / binWidth),
-      binCount - 1
-    )
-    if (binIndex >= 0 && binIndex < binCount) {
-      bins[binIndex].count++
+  // Calculate PDF values when parameters change
+  useEffect(() => {
+    if (!showPdf || !parameters || !webR || !hasData) {
+      setPdfValues([])
+      return
     }
-  })
 
-  // Create histogram bars - just use raw count for now
-  const histogramBars: Array<{
-    index: number
-    bin: string
-    count: number
-    pdf?: number
-  }> = bins.map((bin, index) => ({
+    const numPoints = Math.max(50, binCount * 4)
+    const step = (max - min) / (numPoints - 1)
+    const xValues = Array.from({ length: numPoints }, (_, i) => min + i * step)
+
+    calculatePdfValues(webR, xValues, parameters)
+      .then((values) => setPdfValues(values))
+      .catch((error) => {
+        console.error("Failed to calculate PDF values:", error)
+        setPdfValues([])
+      })
+  }, [showPdf, parameters, webR, hasData, min, max, binCount])
+
+  const histogramBars = bins.map((count, index) => ({
     index,
-    bin: `${bin.binStart.toFixed(1)} - ${bin.binEnd.toFixed(1)}`,
-    count: bin.count,
+    count,
   }))
 
-  const maxY = Math.max(...histogramBars.map((b) => b.count))
+  const maxY = Math.max(...bins, 0)
 
-  // Add PDF values to histogram bars if needed
-  if (showPdf && parameters) {
-    const pdfValues = bins.map((bin) => {
-      const x = (bin.binStart + bin.binEnd) / 2
-      return generatePdfCurve(x, x, parameters, 1)[0]?.y || 0
-    })
-
-    const maxPdf = Math.max(...pdfValues)
-    const scaleFactor = maxPdf > 0 ? maxY / maxPdf : 1
-
-    histogramBars.forEach((bar, i) => {
-      bar.pdf = pdfValues[i] * scaleFactor
-    })
-  }
-
-  const chartData = histogramBars
+  const pdfChartData =
+    showPdf && pdfValues.length > 0
+      ? pdfValues.map((pdfValue, i) => ({
+          index: (i / (pdfValues.length - 1)) * (binCount - 1),
+          pdf: pdfValue * binWidth * data.length,
+        }))
+      : []
 
   const chartConfig = {
     count: {
@@ -95,33 +100,60 @@ export const Histogram = ({
     },
   }
 
+  // Early return after all hooks
+  if (!hasData) {
+    return null
+  }
+
   return (
-    <ChartContainer
-      config={chartConfig}
-      className="h-full w-full bg-background outline-none [&_svg]:outline-none [&_svg]:focus:outline-none"
-    >
-      <ComposedChart data={chartData} barCategoryGap="5%">
-        <XAxis dataKey="index" hide />
-        <YAxis hide domain={[0, maxY * 1.1]} />
-        {showPdf && (
-          <Line
-            type="natural"
-            dataKey="pdf"
-            stroke="var(--color-pdf)"
-            strokeWidth={3}
-            dot={false}
-            isAnimationActive={false}
-            activeDot={false}
-            legendType="none"
+    <div className="relative h-full w-full">
+      {/* Histogram bars */}
+      <ChartContainer
+        config={chartConfig}
+        className="h-full w-full bg-background outline-none [&_svg]:outline-none [&_svg]:focus:outline-none"
+      >
+        <BarChart data={histogramBars}>
+          <XAxis dataKey="index" hide />
+          <YAxis hide domain={[0, maxY * 1.1]} />
+          <Bar
+            dataKey="count"
+            fill="var(--color-count)"
+            animationDuration={animationDuration}
+            animationEasing="ease-in-out"
+            minPointSize={2}
           />
-        )}
-        <Bar
-          dataKey="count"
-          fill="var(--color-count)"
-          animationDuration={animationDuration}
-          animationEasing="ease-in-out"
-        />
-      </ComposedChart>
-    </ChartContainer>
+        </BarChart>
+      </ChartContainer>
+
+      {/* PDF overlay - positioned on top */}
+      {showPdf && pdfChartData.length > 0 && (
+        <div className="absolute inset-0 pointer-events-none">
+          <ChartContainer
+            config={chartConfig}
+            className="h-full w-full bg-transparent outline-none [&_svg]:outline-none [&_svg]:focus:outline-none"
+          >
+            <LineChart data={pdfChartData}>
+              <XAxis
+                dataKey="index"
+                type="number"
+                domain={[0, binCount - 1]}
+                hide
+              />
+              <YAxis hide domain={[0, maxY * 1.1]} />
+              <Line
+                type="monotone"
+                dataKey="pdf"
+                stroke="var(--color-pdf)"
+                strokeWidth={3}
+                dot={false}
+                isAnimationActive={false}
+                activeDot={false}
+                legendType="none"
+              />
+            </LineChart>
+          </ChartContainer>
+        </div>
+      )}
+    </div>
   )
 }

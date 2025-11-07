@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import useLocalStorage from "@/hooks/use-local-storage"
+import { useWebR } from "@/hooks/use-webr"
 import { FullScreen, useFullScreenHandle } from "react-full-screen"
 import { FullscreenIcon, PauseIcon, PlayIcon, RotateCcwIcon } from "lucide-react"
 
@@ -28,6 +29,9 @@ import { calculateAllStats } from "@/lib/utils"
 import { StatisticsSummary } from "@/components/statistics"
 
 const App = () => {
+  // WebR instance
+  const { webR, loading: webRLoading } = useWebR()
+
   // States
   const [distribution, setDistribution] = useState<Distribution>("normal")
   const [parameters, setParameters] = useState<Parameters>(
@@ -107,9 +111,11 @@ const App = () => {
     })
   }, [])
 
-  const addSamples = useCallback(() => {
+  const addSamples = useCallback(async () => {
+    if (!webR) return
+
     const { n } = SPEED_SETTINGS[speed]
-    const newSamples = draw(n, parameters)
+    const newSamples = await draw(webR, n, parameters)
 
     setSamples((prevSamples) => {
       // Stop sampling if we've reached the maximum
@@ -126,7 +132,7 @@ const App = () => {
 
       return combined
     })
-  }, [parameters, speed])
+  }, [webR, parameters, speed])
 
   // Stop sampling when we reach the limit
   useEffect(() => {
@@ -137,9 +143,11 @@ const App = () => {
 
   // Set intervals for drawing samples and updating statistics
   useEffect(() => {
-    if (isSampling) {
+    if (isSampling && webR) {
       const { interval } = SPEED_SETTINGS[speed]
-      samplingIntervalRef.current = setInterval(addSamples, interval)
+      samplingIntervalRef.current = setInterval(() => {
+        addSamples()
+      }, interval)
     }
 
     return () => {
@@ -148,7 +156,7 @@ const App = () => {
         samplingIntervalRef.current = null
       }
     }
-  }, [isSampling, addSamples, speed])
+  }, [isSampling, addSamples, speed, webR])
 
   useEffect(() => {
     if (isSampling && showStats) {
@@ -209,6 +217,7 @@ const App = () => {
               <Button
                 className="w-32 justify-start"
                 onClick={handleClick}
+                disabled={webRLoading}
                 aria-label={isSampling ? "Pause sampling" : "Start sampling from distribution"}
               >
                 <div className="w-4 h-4 mr-2">
@@ -218,7 +227,7 @@ const App = () => {
                     <PlayIcon className="h-4 w-4" />
                   )}
                 </div>
-                {isSampling ? "Pause" : "Sample"}
+                {webRLoading ? "Loading..." : isSampling ? "Pause" : "Sample"}
               </Button>
               <Button
                 variant="outline"

@@ -1,25 +1,82 @@
-import { rnorm } from "@/lib/distributions/rnorm"
-import { runif } from "@/lib/distributions/runif"
-import { rlnorm } from "@/lib/distributions/rlnorm"
-import { rpert } from "@/lib/distributions/rpert"
-import { rbeta } from "@/lib/distributions/rbeta"
+import { WebR, type RObject } from "webr"
+import { Parameters } from "@/lib/types"
 import { rmetalog } from "./distributions/rmetalog"
 
-import { Parameters } from "@/lib/types"
-
-export const draw = (n: number, params: Parameters): number[] => {
+/**
+ * Draw samples from a distribution using webR
+ * For most distributions, we use R's built-in functions
+ * For Metalog, we still use the custom implementation
+ */
+export const draw = async (
+  webR: WebR,
+  n: number,
+  params: Parameters
+): Promise<number[]> => {
   switch (params.type) {
-    case "normal":
-      return rnorm(n, params.mean, params.sd)
-    case "lognormal":
-      return rlnorm(n, params.meanlog, params.sdlog)
-    case "uniform":
-      return runif(n, params.min, params.max)
-    case "beta":
-      return rbeta(n, params.alpha, params.beta)
-    case "pert":
-      return rpert(n, params.min, params.mode, params.max)
-    case "metalog":
+    case "normal": {
+      const result = (await webR.evalR(
+        `rnorm(${n}, mean = ${params.mean}, sd = ${params.sd})`
+      )) as RObject & { toArray: () => Promise<unknown[]> }
+      try {
+        return (await result.toArray()) as number[]
+      } finally {
+        await webR.destroy(result)
+      }
+    }
+
+    case "lognormal": {
+      const result = (await webR.evalR(
+        `rlnorm(${n}, meanlog = ${params.meanlog}, sdlog = ${params.sdlog})`
+      )) as RObject & { toArray: () => Promise<unknown[]> }
+      try {
+        return (await result.toArray()) as number[]
+      } finally {
+        await webR.destroy(result)
+      }
+    }
+
+    case "uniform": {
+      const result = (await webR.evalR(
+        `runif(${n}, min = ${params.min}, max = ${params.max})`
+      )) as RObject & { toArray: () => Promise<unknown[]> }
+      try {
+        return (await result.toArray()) as number[]
+      } finally {
+        await webR.destroy(result)
+      }
+    }
+
+    case "beta": {
+      const result = (await webR.evalR(
+        `rbeta(${n}, shape1 = ${params.alpha}, shape2 = ${params.beta})`
+      )) as RObject & { toArray: () => Promise<unknown[]> }
+      try {
+        return (await result.toArray()) as number[]
+      } finally {
+        await webR.destroy(result)
+      }
+    }
+
+    case "pert": {
+      // PERT distribution using R's beta distribution with transformed parameters
+      const { min, mode, max } = params
+      const range = max - min
+      const modeNorm = (mode - min) / range
+      const alpha = 1 + 4 * modeNorm
+      const beta = 1 + 4 * (1 - modeNorm)
+
+      const result = (await webR.evalR(
+        `${min} + ${range} * rbeta(${n}, shape1 = ${alpha}, shape2 = ${beta})`
+      )) as RObject & { toArray: () => Promise<unknown[]> }
+      try {
+        return (await result.toArray()) as number[]
+      } finally {
+        await webR.destroy(result)
+      }
+    }
+
+    case "metalog": {
+      // Metalog doesn't have a native R implementation, use custom one
       return rmetalog(
         n,
         [
@@ -29,5 +86,6 @@ export const draw = (n: number, params: Parameters): number[] => {
         ],
         { lower: params.lower, upper: params.upper }
       )
+    }
   }
 }
