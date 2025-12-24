@@ -23,7 +23,7 @@ export function SettingsSidebarTrigger({
       }}
       {...props}
     >
-      <SettingsIcon />
+      <SettingsIcon className="text-muted-foreground" />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )

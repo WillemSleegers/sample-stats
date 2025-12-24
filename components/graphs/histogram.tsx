@@ -92,11 +92,11 @@ export const Histogram = ({
   const chartConfig = {
     count: {
       label: "Count",
-      color: "hsl(var(--chart-1))",
+      color: "hsl(var(--primary))",
     },
     pdf: {
       label: "Theoretical curve",
-      color: "hsl(var(--chart-2))",
+      color: "hsl(var(--secondary))",
     },
   }
 
@@ -117,10 +117,9 @@ export const Histogram = ({
           <YAxis hide domain={[0, maxY * 1.1]} />
           <Bar
             dataKey="count"
-            fill="var(--color-count)"
+            fill="var(--primary)"
             animationDuration={animationDuration}
             animationEasing="ease-in-out"
-            minPointSize={2}
           />
         </BarChart>
       </ChartContainer>
@@ -143,7 +142,7 @@ export const Histogram = ({
               <Line
                 type="monotone"
                 dataKey="pdf"
-                stroke="var(--color-pdf)"
+                stroke="var(--secondary)"
                 strokeWidth={3}
                 dot={false}
                 isAnimationActive={false}

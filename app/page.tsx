@@ -4,7 +4,12 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import useLocalStorage from "@/hooks/use-local-storage"
 import { useWebR } from "@/hooks/use-webr"
 import { FullScreen, useFullScreenHandle } from "react-full-screen"
-import { FullscreenIcon, PauseIcon, PlayIcon, RotateCcwIcon } from "lucide-react"
+import {
+  FullscreenIcon,
+  PauseIcon,
+  PlayIcon,
+  RotateCcwIcon,
+} from "lucide-react"
 
 import { Hero } from "@/components/hero"
 import { Button } from "@/components/ui/button"
@@ -14,23 +19,23 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { SettingsSidebarTrigger } from "@/components/sidebar-trigger"
 import { DistributionPicker } from "@/components/distribution-picker"
+import { WebRError } from "@/components/webr-error"
 
 import { draw } from "@/lib/draw"
 
-import { DEFAULT_PARAMETERS, SPEED_SETTINGS, MAX_SAMPLES } from "@/lib/constants"
-
 import {
-  Distribution,
-  Parameters,
-  SpeedSetting,
-  Stats,
-} from "@/lib/types"
+  DEFAULT_PARAMETERS,
+  SPEED_SETTINGS,
+  MAX_SAMPLES,
+} from "@/lib/constants"
+
+import { Distribution, Parameters, SpeedSetting, Stats } from "@/lib/types"
 import { calculateAllStats } from "@/lib/utils"
 import { StatisticsSummary } from "@/components/statistics"
 
 const App = () => {
   // WebR instance
-  const { webR, loading: webRLoading } = useWebR()
+  const { webR, loading: webRLoading, error: webRError } = useWebR()
 
   // States
   const [distribution, setDistribution] = useState<Distribution>("normal")
@@ -46,7 +51,10 @@ const App = () => {
   const [speed, setSpeed] = useLocalStorage<SpeedSetting>("speed", "normal")
   const [showStats, setShowStats] = useLocalStorage<boolean>("showStats", false)
   const [binCount, setBinCount] = useLocalStorage<number>("binCount", 10)
-  const [useSturges, setUseSturges] = useLocalStorage<boolean>("useSturges", false)
+  const [useSturges, setUseSturges] = useLocalStorage<boolean>(
+    "useSturges",
+    false
+  )
   const [showPdf, setShowPdf] = useLocalStorage<boolean>("showPdf", false)
 
   // Refs
@@ -86,9 +94,8 @@ const App = () => {
   }
 
   const handleUpdateParameters = () => {
-    setSamples([])
-    setStats({})
-    setIsSampling(false)
+    // Parameters updated - no need to clear samples
+    // New samples will be drawn from the updated distribution
   }
 
   const updateStats = useCallback(() => {
@@ -189,7 +196,7 @@ const App = () => {
         showPdf={showPdf}
         setShowPdf={setShowPdf}
       />
-      <div className="w-full p-2 mb-16">
+      <div className="w-full p-2">
         <div className="p-2 flex justify-between">
           <SettingsSidebarTrigger className="size-9" />
           <div className="space-x-2">
@@ -200,14 +207,15 @@ const App = () => {
                 onClick={fullScreenHandle.enter}
                 aria-label="Enter fullscreen mode"
               >
-                <FullscreenIcon />
+                <FullscreenIcon className="text-muted-foreground" />
               </Button>
             )}
             <ThemeToggle />
           </div>
         </div>
-        <div className="space-y-8">
+        <div className="space-y-12">
           <Hero />
+          {webRError && <WebRError error={webRError} />}
           <div className="flex flex-col gap-2 items-stretch justify-center max-w-fit mx-auto">
             <DistributionPicker
               distribution={distribution}
@@ -217,8 +225,12 @@ const App = () => {
               <Button
                 className="w-32 justify-start"
                 onClick={handleClick}
-                disabled={webRLoading}
-                aria-label={isSampling ? "Pause sampling" : "Start sampling from distribution"}
+                disabled={webRLoading || !!webRError}
+                aria-label={
+                  isSampling
+                    ? "Pause sampling"
+                    : "Start sampling from distribution"
+                }
               >
                 <div className="w-4 h-4 mr-2">
                   {isSampling ? (
@@ -227,7 +239,13 @@ const App = () => {
                     <PlayIcon className="h-4 w-4" />
                   )}
                 </div>
-                {webRLoading ? "Loading..." : isSampling ? "Pause" : "Sample"}
+                {webRLoading
+                  ? "Loading..."
+                  : webRError
+                  ? "Error"
+                  : isSampling
+                  ? "Pause"
+                  : "Sample"}
               </Button>
               <Button
                 variant="outline"
@@ -241,23 +259,25 @@ const App = () => {
             </div>
           </div>
 
-          {samples.length > 0 && (
-            <div className="text-sm text-muted-foreground text-center">
-              Total Samples: {samples.length.toLocaleString()}
-            </div>
-          )}
-
           <FullScreen
             handle={fullScreenHandle}
-            className="h-[400px] max-w-[600px] mx-auto outline-none"
+            className="h-100 max-w-150 mx-auto outline-none"
           >
             <div
               role="img"
-              aria-label={`Histogram showing ${samples.length.toLocaleString()} samples from ${distribution} distribution${showPdf ? ' with theoretical probability density curve overlay' : ''}`}
+              aria-label={`Histogram showing ${samples.length.toLocaleString()} samples from ${distribution} distribution${
+                showPdf
+                  ? " with theoretical probability density curve overlay"
+                  : ""
+              }`}
             >
               <Histogram
                 data={samples}
-                binCount={useSturges ? Math.ceil(Math.log2(samples.length) + 1) : binCount}
+                binCount={
+                  useSturges
+                    ? Math.ceil(Math.log2(samples.length) + 1)
+                    : binCount
+                }
                 animationDuration={SPEED_SETTINGS[speed].animationDuration}
                 showPdf={showPdf}
                 parameters={parameters}
@@ -265,7 +285,9 @@ const App = () => {
             </div>
           </FullScreen>
 
-          {showStats && <StatisticsSummary stats={stats} />}
+          {showStats && samples.length > 0 && (
+            <StatisticsSummary stats={stats} sampleCount={samples.length} />
+          )}
         </div>
       </div>
     </SidebarProvider>

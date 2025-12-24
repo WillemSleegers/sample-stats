@@ -2,14 +2,19 @@ import { Stats } from "@/lib/types"
 
 type StatisticsSummaryProps = {
   stats: Stats
+  sampleCount: number
 }
 
-export const StatisticsSummary = ({ stats }: StatisticsSummaryProps) => {
+export const StatisticsSummary = ({ stats, sampleCount }: StatisticsSummaryProps) => {
   return (
-    <div className="max-w-2xl mx-auto space-y-4">
+    <div className="max-w-2xl mx-auto space-y-4 mb-16">
       <h3 className="text-lg font-semibold text-center">Summary Statistics</h3>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {/* Sample Count */}
+        <StatGroup>
+          <StatCard label="Samples" value={sampleCount} decimals={0} />
+        </StatGroup>
         {/* Central Tendency */}
         <StatGroup>
           <StatCard label="Mean" value={stats.mean} />
@@ -46,14 +51,14 @@ function StatGroup({ children }: { children: React.ReactNode }) {
   )
 }
 
-function StatCard({ label, value }: { label: string; value?: number }) {
+function StatCard({ label, value, decimals = 2 }: { label: string; value?: number; decimals?: number }) {
   return (
     <div className="bg-muted/50 rounded-lg p-4 border border-border">
       <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
         {label}
       </div>
       <div className="text-2xl font-bold tabular-nums">
-        {value !== undefined ? value.toFixed(2) : "-"}
+        {value !== undefined ? (decimals === 0 ? value.toLocaleString() : value.toFixed(decimals)) : "-"}
       </div>
     </div>
   )

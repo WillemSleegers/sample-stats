@@ -23,7 +23,7 @@ const SelectSpeed = ({ speed, setSpeed }: SelectSpeedProps) => {
     <div className="space-y-2">
       <Label>Speed</Label>
       <Select value={speed} onValueChange={handleValueChange}>
-        <SelectTrigger className="min-w-[100px]">
+        <SelectTrigger className="min-w-25 bg-background">
           <SelectValue placeholder="Change speed" />
         </SelectTrigger>
         <SelectContent>

@@ -2,8 +2,6 @@
 
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
-import type { TooltipContentProps } from "recharts"
-import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent"
 
 import { cn } from "@/lib/utils"
 
@@ -106,7 +104,7 @@ const ChartTooltip = RechartsPrimitive.Tooltip
 
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
-  TooltipContentProps<ValueType, NameType> &
+  React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
     React.ComponentProps<"div"> & {
       hideLabel?: boolean
       hideIndicator?: boolean
@@ -181,7 +179,7 @@ const ChartTooltipContent = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
+          "grid min-w-32 items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
           className
         )}
       >
@@ -264,9 +262,8 @@ const ChartLegend = RechartsPrimitive.Legend
 
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"div"> & {
-      payload?: any[]
-      verticalAlign?: "top" | "bottom" | "middle"
+  React.ComponentProps<"div"> &
+    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
       hideIcon?: boolean
       nameKey?: string
     }
