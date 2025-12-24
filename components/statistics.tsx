@@ -7,14 +7,15 @@ type StatisticsSummaryProps = {
 
 export const StatisticsSummary = ({ stats, sampleCount }: StatisticsSummaryProps) => {
   return (
-    <div className="max-w-2xl mx-auto space-y-4 mb-16">
+    <div className="max-w-3xl mx-auto space-y-4 mb-16">
       <h3 className="text-lg font-semibold text-center">Summary Statistics</h3>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         {/* Sample Count */}
         <StatGroup>
           <StatCard label="Samples" value={sampleCount} decimals={0} />
         </StatGroup>
+
         {/* Central Tendency */}
         <StatGroup>
           <StatCard label="Mean" value={stats.mean} />

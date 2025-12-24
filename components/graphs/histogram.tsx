@@ -34,7 +34,8 @@ export const Histogram = ({
 
   const min = hasData ? Math.min(...data) : 0
   const max = hasData ? Math.max(...data) : 0
-  const binWidth = hasData ? (max - min) / binCount || 1 : 1
+  const range = max - min
+  const binWidth = hasData && range > 0 ? range / binCount : 1
 
   // Initialize and populate bins
   const bins = hasData
@@ -68,8 +69,8 @@ export const Histogram = ({
 
     calculatePdfValues(webR, xValues, parameters)
       .then((values) => setPdfValues(values))
-      .catch((error) => {
-        console.error("Failed to calculate PDF values:", error)
+      .catch(() => {
+        // Silently fail - PDF overlay simply won't show if calculation fails
         setPdfValues([])
       })
   }, [showPdf, parameters, webR, hasData, min, max, binCount])
@@ -102,7 +103,13 @@ export const Histogram = ({
 
   // Early return after all hooks
   if (!hasData) {
-    return null
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <p className="text-muted-foreground text-center">
+          Click <span className="font-semibold">Sample</span> to start drawing from the distribution
+        </p>
+      </div>
+    )
   }
 
   return (

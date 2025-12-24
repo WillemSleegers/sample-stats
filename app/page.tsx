@@ -196,10 +196,10 @@ const App = () => {
         showPdf={showPdf}
         setShowPdf={setShowPdf}
       />
-      <div className="w-full p-2">
-        <div className="p-2 flex justify-between">
-          <SettingsSidebarTrigger className="size-9" />
-          <div className="space-x-2">
+      <div className="w-full p-4 md:p-6">
+        <div className="flex justify-between items-center mb-8">
+          <SettingsSidebarTrigger />
+          <div className="flex gap-2">
             {fullScreenEnabled && (
               <Button
                 size="icon"
@@ -215,7 +215,7 @@ const App = () => {
         </div>
         <div className="space-y-12">
           <Hero />
-          {webRError && <WebRError error={webRError} />}
+          {webRError && <WebRError />}
           <div className="flex flex-col gap-2 items-stretch justify-center max-w-fit mx-auto">
             <DistributionPicker
               distribution={distribution}
@@ -284,6 +284,12 @@ const App = () => {
               />
             </div>
           </FullScreen>
+
+          {samples.length >= MAX_SAMPLES && (
+            <p className="text-center text-sm text-muted-foreground">
+              Maximum sample limit reached ({MAX_SAMPLES.toLocaleString()} samples)
+            </p>
+          )}
 
           {showStats && samples.length > 0 && (
             <StatisticsSummary stats={stats} sampleCount={samples.length} />

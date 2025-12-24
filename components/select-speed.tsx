@@ -14,16 +14,16 @@ type SelectSpeedProps = {
   setSpeed: Dispatch<SetStateAction<SpeedSetting>>
 }
 
-const SelectSpeed = ({ speed, setSpeed }: SelectSpeedProps) => {
+export const SelectSpeed = ({ speed, setSpeed }: SelectSpeedProps) => {
   const handleValueChange = (value: string) => {
     setSpeed(value as SpeedSetting)
   }
 
   return (
     <div className="space-y-2">
-      <Label>Speed</Label>
+      <Label htmlFor="speed">Speed</Label>
       <Select value={speed} onValueChange={handleValueChange}>
-        <SelectTrigger className="min-w-25 bg-background">
+        <SelectTrigger id="speed" className="min-w-25 bg-background">
           <SelectValue placeholder="Change speed" />
         </SelectTrigger>
         <SelectContent>
@@ -36,5 +36,3 @@ const SelectSpeed = ({ speed, setSpeed }: SelectSpeedProps) => {
     </div>
   )
 }
-
-export default SelectSpeed
