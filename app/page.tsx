@@ -4,12 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import useLocalStorage from "@/hooks/use-local-storage"
 import { useWebR } from "@/hooks/use-webr"
 import { FullScreen, useFullScreenHandle } from "react-full-screen"
-import {
-  FullscreenIcon,
-  PauseIcon,
-  PlayIcon,
-  RotateCcwIcon,
-} from "lucide-react"
+import { FullscreenIcon, RotateCcwIcon } from "lucide-react"
 
 import { Hero } from "@/components/hero"
 import { Button } from "@/components/ui/button"
@@ -45,9 +40,6 @@ const App = () => {
   const [isSampling, setIsSampling] = useState(false)
   const [samples, setSamples] = useState<number[]>([])
   const [stats, setStats] = useState<Stats>({})
-  const [fullScreenEnabled] = useState(
-    typeof window !== "undefined" ? window.document.fullscreenEnabled : false
-  )
 
   // Persisted UI Preferences
   const [speed, setSpeed] = useLocalStorage<SpeedSetting>("speed", "normal")
@@ -195,16 +187,14 @@ const App = () => {
         <div className="flex justify-between items-center mb-8">
           <SettingsSidebarTrigger />
           <div className="flex gap-2">
-            {fullScreenEnabled && (
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={fullScreenHandle.enter}
-                aria-label="Enter fullscreen mode"
-              >
-                <FullscreenIcon className="text-muted-foreground" />
-              </Button>
-            )}
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={fullScreenHandle.enter}
+              aria-label="Enter fullscreen mode"
+            >
+              <FullscreenIcon className="text-muted-foreground" />
+            </Button>
             <ThemeToggle />
           </div>
         </div>
@@ -218,22 +208,11 @@ const App = () => {
             />
             <div className="flex flex-row gap-2">
               <Button
-                className="w-32 justify-start"
+                className="w-32"
                 onClick={handleClick}
                 disabled={webRLoading || !!webRError}
-                aria-label={
-                  isSampling
-                    ? "Pause sampling"
-                    : "Start sampling from distribution"
-                }
+                aria-label={isSampling ? "Pause" : "Sample"}
               >
-                <div className="w-4 h-4 mr-2">
-                  {isSampling ? (
-                    <PauseIcon className="h-4 w-4" />
-                  ) : (
-                    <PlayIcon className="h-4 w-4" />
-                  )}
-                </div>
                 {webRLoading
                   ? "Loading..."
                   : webRError

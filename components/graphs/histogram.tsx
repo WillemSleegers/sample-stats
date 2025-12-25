@@ -114,13 +114,7 @@ export const Histogram = ({
 
   // Early return after all hooks
   if (!hasData) {
-    return (
-      <div className="h-full w-full flex items-center justify-center">
-        <p className="text-muted-foreground text-center">
-          Click <span className="font-semibold">Sample</span> to start drawing from the distribution
-        </p>
-      </div>
-    )
+    return <div className="h-full w-full" />
   }
 
   return (
