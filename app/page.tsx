@@ -45,7 +45,9 @@ const App = () => {
   const [isSampling, setIsSampling] = useState(false)
   const [samples, setSamples] = useState<number[]>([])
   const [stats, setStats] = useState<Stats>({})
-  const [fullScreenEnabled, setFullScreenEnabled] = useState(true)
+  const [fullScreenEnabled] = useState(
+    typeof window !== "undefined" ? window.document.fullscreenEnabled : false
+  )
 
   // Persisted UI Preferences
   const [speed, setSpeed] = useLocalStorage<SpeedSetting>("speed", "normal")
@@ -65,16 +67,13 @@ const App = () => {
   // Full screen
   const fullScreenHandle = useFullScreenHandle()
 
-  // Setup
-  useEffect(() => {
-    setFullScreenEnabled(window.document.fullscreenEnabled)
-  }, [])
-
-  // On distribution change
-  useEffect(() => {
+  // On distribution change - reset state
+  const handleDistributionChange = useCallback((value: Distribution | ((prev: Distribution) => Distribution)) => {
+    const newDistribution = typeof value === "function" ? value(distribution) : value
+    setDistribution(newDistribution)
     setIsSampling(false)
-    setSamples([]) // Clear samples
-    setParameters(DEFAULT_PARAMETERS[distribution])
+    setSamples([])
+    setParameters(DEFAULT_PARAMETERS[newDistribution])
   }, [distribution])
 
   // On samples change
@@ -127,26 +126,22 @@ const App = () => {
     setSamples((prevSamples) => {
       // Stop sampling if we've reached the maximum
       if (prevSamples.length >= MAX_SAMPLES) {
+        // Stop sampling by clearing the interval
+        setIsSampling(false)
         return prevSamples
       }
 
       const combined = [...prevSamples, ...newSamples]
 
-      // If this batch would exceed the limit, cap at MAX_SAMPLES
+      // If this batch would exceed the limit, cap at MAX_SAMPLES and stop
       if (combined.length >= MAX_SAMPLES) {
+        setIsSampling(false)
         return combined.slice(0, MAX_SAMPLES)
       }
 
       return combined
     })
   }, [webR, parameters, speed])
-
-  // Stop sampling when we reach the limit
-  useEffect(() => {
-    if (samples.length >= MAX_SAMPLES && isSampling) {
-      setIsSampling(false)
-    }
-  }, [samples.length, isSampling])
 
   // Set intervals for drawing samples and updating statistics
   useEffect(() => {
@@ -219,7 +214,7 @@ const App = () => {
           <div className="flex flex-col gap-2 items-stretch justify-center max-w-fit mx-auto">
             <DistributionPicker
               distribution={distribution}
-              setDistribution={setDistribution}
+              setDistribution={handleDistributionChange}
             />
             <div className="flex flex-row gap-2">
               <Button

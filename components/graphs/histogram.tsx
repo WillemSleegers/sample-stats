@@ -28,9 +28,12 @@ export const Histogram = ({
   parameters,
 }: HistogramProps) => {
   const { webR } = useWebR()
-  const [pdfValues, setPdfValues] = useState<number[]>([])
+  const [pdfValuesInternal, setPdfValuesInternal] = useState<number[]>([])
 
   const hasData = data.length > 0
+
+  // Derive the actual PDF values - only show when showPdf is true
+  const pdfValues = showPdf ? pdfValuesInternal : []
 
   const min = hasData ? Math.min(...data) : 0
   const max = hasData ? Math.max(...data) : 0
@@ -59,20 +62,28 @@ export const Histogram = ({
   // Calculate PDF values when parameters change
   useEffect(() => {
     if (!showPdf || !parameters || !webR || !hasData) {
-      setPdfValues([])
       return
     }
+
+    let cancelled = false
 
     const numPoints = Math.max(50, binCount * 4)
     const step = (max - min) / (numPoints - 1)
     const xValues = Array.from({ length: numPoints }, (_, i) => min + i * step)
 
     calculatePdfValues(webR, xValues, parameters)
-      .then((values) => setPdfValues(values))
+      .then((values) => {
+        if (!cancelled) {
+          setPdfValuesInternal(values)
+        }
+      })
       .catch(() => {
         // Silently fail - PDF overlay simply won't show if calculation fails
-        setPdfValues([])
       })
+
+    return () => {
+      cancelled = true
+    }
   }, [showPdf, parameters, webR, hasData, min, max, binCount])
 
   const histogramBars = bins.map((count, index) => ({

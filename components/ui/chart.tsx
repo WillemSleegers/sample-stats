@@ -104,6 +104,7 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type TooltipPayload = {
   value?: any
   name?: any
@@ -134,6 +135,7 @@ interface ChartTooltipContentProps extends React.ComponentProps<"div"> {
   ) => React.ReactNode
   color?: string
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 function ChartTooltipContent({
   active,
@@ -276,12 +278,14 @@ function ChartTooltipContent({
 
 const ChartLegend = RechartsPrimitive.Legend
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type LegendPayload = {
   value?: any
   dataKey?: string | number
   color?: string
   type?: string
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 interface ChartLegendContentProps extends React.ComponentProps<"div"> {
   payload?: LegendPayload[]
