@@ -61,6 +61,9 @@ export type Stats = {
   mean?: number
   variance?: number
   stdDev?: number
+  skewness?: number
+  kurtosis?: number
+  mode?: number
 }
 
 export type SpeedSetting = keyof typeof SPEED_SETTINGS

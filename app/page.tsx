@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect } from "react"
 import useLocalStorage from "@/hooks/use-local-storage"
 import { useWebR } from "@/hooks/use-webr"
 import { FullScreen, useFullScreenHandle } from "react-full-screen"
@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { AppSidebar } from "@/components/app-sidebar"
 import { Histogram } from "@/components/graphs/histogram"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { SidebarProvider } from "@/components/ui/sidebar"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { SettingsSidebarTrigger } from "@/components/sidebar-trigger"
 import { DistributionPicker } from "@/components/distribution-picker"
 import { WebRError } from "@/components/webr-error"
@@ -60,13 +60,13 @@ const App = () => {
   const fullScreenHandle = useFullScreenHandle()
 
   // On distribution change - reset state
-  const handleDistributionChange = useCallback((value: Distribution | ((prev: Distribution) => Distribution)) => {
+  const handleDistributionChange = (value: Distribution | ((prev: Distribution) => Distribution)) => {
     const newDistribution = typeof value === "function" ? value(distribution) : value
     setDistribution(newDistribution)
     setIsSampling(false)
     setSamples([])
     setParameters(DEFAULT_PARAMETERS[newDistribution])
-  }, [distribution])
+  }
 
   // On samples change
   useEffect(() => {
@@ -84,32 +84,16 @@ const App = () => {
     setStats({})
   }
 
-  const handleUpdateParameters = () => {
-    // Parameters updated - no need to clear samples
-    // New samples will be drawn from the updated distribution
-  }
-
-  const updateStats = useCallback(() => {
+  const updateStats = () => {
     const currentSamples = samplesRef.current
     if (currentSamples.length === 0) return
 
     // Use optimized single-pass calculation
     const newStats = calculateAllStats(currentSamples)
+    setStats(newStats)
+  }
 
-    // Set new stats, if one of them has changed
-    setStats((prevStats) => {
-      const hasChanged =
-        prevStats.p10 !== newStats.p10 ||
-        prevStats.p50 !== newStats.p50 ||
-        prevStats.p90 !== newStats.p90 ||
-        prevStats.min !== newStats.min ||
-        prevStats.max !== newStats.max ||
-        prevStats.mean !== newStats.mean
-      return hasChanged ? newStats : prevStats
-    })
-  }, [])
-
-  const addSamples = useCallback(async () => {
+  const addSamples = async () => {
     if (!webR) return
 
     const { n } = SPEED_SETTINGS[speed]
@@ -133,7 +117,7 @@ const App = () => {
 
       return combined
     })
-  }, [webR, parameters, speed])
+  }
 
   // Set intervals for drawing samples and updating statistics
   useEffect(() => {
@@ -171,7 +155,6 @@ const App = () => {
       <AppSidebar
         distribution={distribution}
         setParams={setParameters}
-        onUpdateParameters={handleUpdateParameters}
         speed={speed}
         setSpeed={setSpeed}
         showStats={showStats}
@@ -183,8 +166,9 @@ const App = () => {
         showPdf={showPdf}
         setShowPdf={setShowPdf}
       />
-      <div className="w-full p-4 md:p-6">
-        <div className="flex justify-between items-center mb-8">
+      <SidebarInset>
+        <div className="w-full p-4 md:p-6">
+          <div className="flex justify-between items-center mb-8">
           <SettingsSidebarTrigger />
           <div className="flex gap-2">
             <Button
@@ -269,7 +253,8 @@ const App = () => {
             <StatisticsSummary stats={stats} sampleCount={samples.length} />
           )}
         </div>
-      </div>
+        </div>
+      </SidebarInset>
     </SidebarProvider>
   )
 }

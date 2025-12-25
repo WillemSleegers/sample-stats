@@ -16,7 +16,6 @@ import {
 type AppSidebarProps = {
   distribution: Distribution
   setParams: Dispatch<SetStateAction<Parameters>>
-  onUpdateParameters: () => void
   speed: SpeedSetting
   setSpeed: Dispatch<SetStateAction<SpeedSetting>>
   showStats: boolean
@@ -32,7 +31,6 @@ type AppSidebarProps = {
 export const AppSidebar = ({
   distribution,
   setParams,
-  onUpdateParameters,
   speed,
   setSpeed,
   showStats,
@@ -58,7 +56,6 @@ export const AppSidebar = ({
             <FormDistribution
               distribution={distribution}
               setParams={setParams}
-              onUpdate={onUpdateParameters}
             />
           </FieldGroup>
 

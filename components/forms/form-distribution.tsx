@@ -19,7 +19,6 @@ import { DEFAULT_PARAMETERS } from "@/lib/constants"
 
 type FormProps = {
   setParams: Dispatch<SetStateAction<Parameters>>
-  onUpdate: () => void
 }
 
 // Normal Distribution Form
@@ -28,7 +27,7 @@ const normalSchema = z.object({
   sd: z.number().positive("Standard deviation must be positive"),
 })
 
-function FormNormal({ setParams, onUpdate }: FormProps) {
+function FormNormal({ setParams }: FormProps) {
   const form = useForm<z.infer<typeof normalSchema>>({
     resolver: zodResolver(normalSchema),
     defaultValues: {
@@ -39,7 +38,6 @@ function FormNormal({ setParams, onUpdate }: FormProps) {
 
   const onSubmit = (data: z.infer<typeof normalSchema>) => {
     setParams({ type: "normal", ...data })
-    onUpdate()
   }
 
   return (
@@ -97,7 +95,7 @@ const lognormalSchema = z.object({
   sdlog: z.number().positive("Standard deviation must be positive"),
 })
 
-function FormLognormal({ setParams, onUpdate }: FormProps) {
+function FormLognormal({ setParams }: FormProps) {
   const form = useForm<z.infer<typeof lognormalSchema>>({
     resolver: zodResolver(lognormalSchema),
     defaultValues: {
@@ -108,7 +106,6 @@ function FormLognormal({ setParams, onUpdate }: FormProps) {
 
   const onSubmit = (data: z.infer<typeof lognormalSchema>) => {
     setParams({ type: "lognormal", ...data })
-    onUpdate()
   }
 
   return (
@@ -173,7 +170,7 @@ const uniformSchema = z
     path: ["max"],
   })
 
-function FormUniform({ setParams, onUpdate }: FormProps) {
+function FormUniform({ setParams }: FormProps) {
   const form = useForm<z.infer<typeof uniformSchema>>({
     resolver: zodResolver(uniformSchema),
     defaultValues: {
@@ -184,7 +181,6 @@ function FormUniform({ setParams, onUpdate }: FormProps) {
 
   const onSubmit = (data: z.infer<typeof uniformSchema>) => {
     setParams({ type: "uniform", ...data })
-    onUpdate()
   }
 
   return (
@@ -240,7 +236,7 @@ const betaSchema = z.object({
   beta: z.number().positive("Beta must be positive"),
 })
 
-function FormBeta({ setParams, onUpdate }: FormProps) {
+function FormBeta({ setParams }: FormProps) {
   const form = useForm<z.infer<typeof betaSchema>>({
     resolver: zodResolver(betaSchema),
     defaultValues: {
@@ -251,7 +247,6 @@ function FormBeta({ setParams, onUpdate }: FormProps) {
 
   const onSubmit = (data: z.infer<typeof betaSchema>) => {
     setParams({ type: "beta", ...data })
-    onUpdate()
   }
 
   return (
@@ -321,7 +316,7 @@ const pertSchema = z
     path: ["mode"],
   })
 
-function FormPert({ setParams, onUpdate }: FormProps) {
+function FormPert({ setParams }: FormProps) {
   const form = useForm<z.infer<typeof pertSchema>>({
     resolver: zodResolver(pertSchema),
     defaultValues: {
@@ -333,7 +328,6 @@ function FormPert({ setParams, onUpdate }: FormProps) {
 
   const onSubmit = (data: z.infer<typeof pertSchema>) => {
     setParams({ type: "pert", ...data })
-    onUpdate()
   }
 
   return (
@@ -450,7 +444,7 @@ const metalogSchema = z
     path: ["p90"],
   })
 
-function FormMetalog({ setParams, onUpdate }: FormProps) {
+function FormMetalog({ setParams }: FormProps) {
   const form = useForm<z.infer<typeof metalogSchema>>({
     resolver: zodResolver(metalogSchema),
     defaultValues: {
@@ -464,7 +458,6 @@ function FormMetalog({ setParams, onUpdate }: FormProps) {
 
   const onSubmit = (data: z.infer<typeof metalogSchema>) => {
     setParams({ type: "metalog", ...data })
-    onUpdate()
   }
 
   return (
@@ -593,26 +586,24 @@ function FormMetalog({ setParams, onUpdate }: FormProps) {
 type FormDistributionProps = {
   distribution: Distribution
   setParams: Dispatch<SetStateAction<Parameters>>
-  onUpdate: () => void
 }
 
 export default function FormDistribution({
   distribution,
   setParams,
-  onUpdate,
 }: FormDistributionProps) {
   switch (distribution) {
     case "normal":
-      return <FormNormal setParams={setParams} onUpdate={onUpdate} />
+      return <FormNormal setParams={setParams} />
     case "lognormal":
-      return <FormLognormal setParams={setParams} onUpdate={onUpdate} />
+      return <FormLognormal setParams={setParams} />
     case "uniform":
-      return <FormUniform setParams={setParams} onUpdate={onUpdate} />
+      return <FormUniform setParams={setParams} />
     case "beta":
-      return <FormBeta setParams={setParams} onUpdate={onUpdate} />
+      return <FormBeta setParams={setParams} />
     case "pert":
-      return <FormPert setParams={setParams} onUpdate={onUpdate} />
+      return <FormPert setParams={setParams} />
     case "metalog":
-      return <FormMetalog setParams={setParams} onUpdate={onUpdate} />
+      return <FormMetalog setParams={setParams} />
   }
 }
