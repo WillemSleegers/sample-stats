@@ -58,6 +58,16 @@ const App = () => {
 
   // Full screen
   const fullScreenHandle = useFullScreenHandle()
+  const [supportsFullscreen, setSupportsFullscreen] = useState(false)
+
+  useEffect(() => {
+    // Check if fullscreen API is supported
+    setSupportsFullscreen(
+      document.fullscreenEnabled ||
+      (document as any).webkitFullscreenEnabled ||
+      false
+    )
+  }, [])
 
   // On distribution change - reset state
   const handleDistributionChange = (value: Distribution | ((prev: Distribution) => Distribution)) => {
@@ -171,14 +181,16 @@ const App = () => {
           <div className="flex justify-between items-center mb-8">
           <SettingsSidebarTrigger />
           <div className="flex gap-2">
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={fullScreenHandle.enter}
-              aria-label="Enter fullscreen mode"
-            >
-              <FullscreenIcon className="text-muted-foreground" />
-            </Button>
+            {supportsFullscreen && (
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={fullScreenHandle.enter}
+                aria-label="Enter fullscreen mode"
+              >
+                <FullscreenIcon className="text-muted-foreground" />
+              </Button>
+            )}
             <ThemeToggle />
           </div>
         </div>
@@ -193,7 +205,7 @@ const App = () => {
             <div className="flex flex-row gap-2">
               <Button
                 className="w-32"
-                onClick={handleClick}
+                onPointerDown={handleClick}
                 disabled={webRLoading || !!webRError}
                 aria-label={isSampling ? "Pause" : "Sample"}
               >
@@ -219,7 +231,7 @@ const App = () => {
 
           <FullScreen
             handle={fullScreenHandle}
-            className="h-100 max-w-150 mx-auto outline-none"
+            className="h-100 max-w-150 mx-auto outline-none fullscreen:h-screen fullscreen:max-w-none fullscreen:flex fullscreen:items-center fullscreen:justify-center fullscreen:bg-background"
           >
             <div
               role="img"
@@ -228,6 +240,7 @@ const App = () => {
                   ? " with theoretical probability density curve overlay"
                   : ""
               }`}
+              className="h-full w-full"
             >
               <Histogram
                 data={samples}
