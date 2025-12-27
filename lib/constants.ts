@@ -1,8 +1,8 @@
 export const SPEED_SETTINGS = {
-  slow: { interval: 1000, n: 1, animationDuration: 1000 },
-  normal: { interval: 500, n: 1, animationDuration: 500 },
-  fast: { interval: 100, n: 1, animationDuration: 100 },
-  fastest: { interval: 50, n: 1, animationDuration: 0 },
+  slow: { interval: 1000, animationDuration: 1000 },
+  normal: { interval: 500, animationDuration: 500 },
+  fast: { interval: 100, animationDuration: 100 },
+  fastest: { interval: 50, animationDuration: 0 },
 }
 
 export const MAX_SAMPLES = 100 // Maximum number of samples to keep in memory
