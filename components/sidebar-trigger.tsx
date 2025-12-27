@@ -15,11 +15,6 @@ export function SettingsSidebarTrigger({
     toggleSidebar()
   }
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault() // Prevent mousedown from firing after touch
-    toggleSidebar()
-  }
-
   return (
     <Button
       data-sidebar="trigger"
@@ -27,8 +22,7 @@ export function SettingsSidebarTrigger({
       variant="ghost"
       size="icon"
       className={cn("size-7", className)}
-      onMouseDown={handleClick}
-      onTouchStart={handleTouchStart}
+      onPointerDown={handleClick}
       {...props}
     >
       <SettingsIcon className="text-muted-foreground" />

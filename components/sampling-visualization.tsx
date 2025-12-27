@@ -130,7 +130,7 @@ export const SamplingVisualization = ({
             binCount={
               useSturges ? Math.ceil(Math.log2(displayedCount) + 1) : binCount
             }
-            animationDuration={0}
+            animationDuration={SPEED_SETTINGS[speed].animationDuration}
             showPdf={showPdf}
             parameters={parameters}
           />
