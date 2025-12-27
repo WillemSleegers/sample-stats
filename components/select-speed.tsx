@@ -12,11 +12,25 @@ import { Label } from "./ui/label"
 type SelectSpeedProps = {
   speed: SpeedSetting
   setSpeed: Dispatch<SetStateAction<SpeedSetting>>
+  mounted?: boolean
 }
 
-export const SelectSpeed = ({ speed, setSpeed }: SelectSpeedProps) => {
+export const SelectSpeed = ({ speed, setSpeed, mounted = true }: SelectSpeedProps) => {
   const handleValueChange = (value: string) => {
     setSpeed(value as SpeedSetting)
+  }
+
+  if (!mounted) {
+    return (
+      <div className="space-y-2">
+        <Label htmlFor="speed">Speed</Label>
+        <Select disabled>
+          <SelectTrigger id="speed" className="min-w-25 bg-background">
+            <SelectValue placeholder="Change speed" />
+          </SelectTrigger>
+        </Select>
+      </div>
+    )
   }
 
   return (

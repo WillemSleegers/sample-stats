@@ -1,19 +1,20 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
 function useLocalStorage<T>(key: string, initialValue: T) {
-  const [storedValue, setStoredValue] = useState<T>(initialValue)
+  // Use lazy initialization to read from localStorage on mount
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === "undefined") {
+      return initialValue
+    }
 
-  // Load from localStorage after mount to avoid hydration mismatch
-  useEffect(() => {
     try {
       const item = window.localStorage.getItem(key)
-      if (item !== null) {
-        setStoredValue(JSON.parse(item))
-      }
+      return item !== null ? JSON.parse(item) : initialValue
     } catch (error) {
       console.warn(`Error reading localStorage key "${key}":`, error)
+      return initialValue
     }
-  }, [key])
+  })
 
   const setValue = (value: T | ((val: T) => T)) => {
     try {

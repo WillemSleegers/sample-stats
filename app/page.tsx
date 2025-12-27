@@ -50,10 +50,10 @@ const App = () => {
   const [supportsFullscreen, setSupportsFullscreen] = useState(false)
 
   useEffect(() => {
-    // Check if fullscreen API is supported
+    // Check fullscreen support only on client to avoid hydration mismatch
     setSupportsFullscreen(
       document.fullscreenEnabled ||
-        (document as any).webkitFullscreenEnabled ||
+        (document as Document & { webkitFullscreenEnabled?: boolean }).webkitFullscreenEnabled ||
         false
     )
   }, [])
@@ -127,6 +127,7 @@ const App = () => {
               <Button
                 size="icon"
                 variant="ghost"
+                className="size-11"
                 onPointerDown={handleFullscreen}
                 disabled={!isSampling}
                 aria-label="Enter fullscreen mode"
@@ -145,10 +146,10 @@ const App = () => {
               />
               <div className="flex flex-row gap-2">
                 <Button
-                  className="w-32"
+                  className="w-32 h-11"
                   onPointerDown={handleSampleClick}
                   disabled={webRLoading || !!webRError}
-                  aria-label={isSampling ? "Pause" : "Sample"}
+                  aria-label={isSampling ? "Pause sampling" : "Start sampling"}
                 >
                   {webRLoading
                     ? "Loading..."
@@ -161,6 +162,7 @@ const App = () => {
                 <Button
                   variant="outline"
                   size="icon"
+                  className="size-11"
                   onPointerDown={handleClear}
                   aria-label="Clear all samples"
                 >

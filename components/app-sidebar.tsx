@@ -1,7 +1,9 @@
+"use client"
+
 import { Sidebar, SidebarContent, SidebarHeader } from "@/components/ui/sidebar"
 import { Distribution, Parameters, SpeedSetting } from "@/lib/types"
 import FormDistribution from "./forms/form-distribution"
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { SelectSpeed } from "./select-speed"
 import { SelectTheme } from "./select-theme"
 import { Switch } from "./ui/switch"
@@ -43,6 +45,13 @@ export const AppSidebar = ({
   showPdf,
   setShowPdf,
 }: AppSidebarProps) => {
+  const [mounted, setMounted] = useState(false)
+
+  // Prevent hydration mismatch for localStorage-dependent values
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
     <Sidebar>
       <SidebarHeader className="font-semibold text-lg px-6 py-4">
@@ -73,10 +82,11 @@ export const AppSidebar = ({
                 </Label>
                 <Switch
                   id="showStats"
-                  checked={showStats}
+                  checked={mounted ? showStats : false}
                   onCheckedChange={() => {
                     setShowStats((prev) => !prev)
                   }}
+                  disabled={!mounted}
                 />
               </div>
 
@@ -86,8 +96,9 @@ export const AppSidebar = ({
                 </Label>
                 <Switch
                   id="showPdf"
-                  checked={showPdf}
+                  checked={mounted ? showPdf : false}
                   onCheckedChange={setShowPdf}
+                  disabled={!mounted}
                 />
               </div>
 
@@ -100,9 +111,9 @@ export const AppSidebar = ({
                   type="number"
                   min={1}
                   max={100}
-                  value={binCount}
+                  value={mounted ? binCount : 10}
                   onChange={(e) => setBinCount(Number(e.target.value))}
-                  disabled={useSturges}
+                  disabled={!mounted || useSturges}
                   className="w-full bg-background"
                 />
               </div>
@@ -113,8 +124,9 @@ export const AppSidebar = ({
                 </Label>
                 <Switch
                   id="useSturges"
-                  checked={useSturges}
+                  checked={mounted ? useSturges : false}
                   onCheckedChange={setUseSturges}
+                  disabled={!mounted}
                 />
               </div>
             </div>
@@ -126,7 +138,7 @@ export const AppSidebar = ({
           <FieldGroup className="gap-3">
             <FieldTitle>Sampling</FieldTitle>
             <FieldDescription>Control sampling speed</FieldDescription>
-            <SelectSpeed speed={speed} setSpeed={setSpeed} />
+            <SelectSpeed speed={speed} setSpeed={setSpeed} mounted={mounted} />
           </FieldGroup>
 
           <FieldSeparator className="my-0" />

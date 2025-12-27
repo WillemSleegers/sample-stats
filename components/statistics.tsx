@@ -28,14 +28,6 @@ export const StatisticsSummary = ({ stats, sampleCount }: StatisticsSummaryProps
   )
 }
 
-function StatGroup({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="space-y-2">
-      {children}
-    </div>
-  )
-}
-
 function StatCard({ label, value, decimals = 2 }: { label: string; value?: number; decimals?: number }) {
   return (
     <div className="bg-muted/50 rounded-lg p-4 border border-border">

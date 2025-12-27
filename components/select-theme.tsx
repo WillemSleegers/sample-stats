@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import {
   Select,
   SelectContent,
@@ -12,6 +13,25 @@ import { Label } from "./ui/label"
 
 export const SelectTheme = () => {
   const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  // Prevent hydration mismatch by only rendering after mount
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <div className="space-y-2">
+        <Label htmlFor="theme">Theme</Label>
+        <Select disabled>
+          <SelectTrigger id="theme" className="min-w-25 bg-background">
+            <SelectValue placeholder="Select theme" />
+          </SelectTrigger>
+        </Select>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-2">

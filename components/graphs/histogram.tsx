@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import {
   Bar,
   BarChart,
@@ -11,6 +11,7 @@ import { ChartContainer } from "@/components/ui/chart"
 import { Parameters } from "@/lib/types"
 import { calculatePdfValues } from "@/lib/pdf"
 import { useWebR } from "@/hooks/use-webr"
+import { useReducedMotion } from "@/hooks/use-reduced-motion"
 
 type HistogramProps = {
   data: number[]
@@ -28,9 +29,13 @@ export const Histogram = ({
   parameters,
 }: HistogramProps) => {
   const { webR } = useWebR()
+  const prefersReducedMotion = useReducedMotion()
   const [pdfValuesInternal, setPdfValuesInternal] = useState<number[]>([])
 
   const hasData = data.length > 0
+
+  // Respect user's motion preference
+  const effectiveAnimationDuration = prefersReducedMotion ? 0 : animationDuration
 
   // Derive the actual PDF values - only show when showPdf is true
   const pdfValues = showPdf ? pdfValuesInternal : []
@@ -93,24 +98,30 @@ export const Histogram = ({
 
   const maxY = Math.max(...bins, 0)
 
-  const pdfChartData =
-    showPdf && pdfValues.length > 0
-      ? pdfValues.map((pdfValue, i) => ({
-          index: (i / (pdfValues.length - 1)) * (binCount - 1),
-          pdf: pdfValue * binWidth * data.length,
-        }))
-      : []
+  const pdfChartData = useMemo(
+    () =>
+      showPdf && pdfValues.length > 0
+        ? pdfValues.map((pdfValue, i) => ({
+            index: (i / (pdfValues.length - 1)) * (binCount - 1),
+            pdf: pdfValue * binWidth * data.length,
+          }))
+        : [],
+    [showPdf, pdfValues, binCount, binWidth, data.length]
+  )
 
-  const chartConfig = {
-    count: {
-      label: "Count",
-      color: "hsl(var(--primary))",
-    },
-    pdf: {
-      label: "Theoretical curve",
-      color: "hsl(var(--secondary))",
-    },
-  }
+  const chartConfig = useMemo(
+    () => ({
+      count: {
+        label: "Count",
+        color: "hsl(var(--primary))",
+      },
+      pdf: {
+        label: "Theoretical curve",
+        color: "hsl(var(--secondary))",
+      },
+    }),
+    []
+  )
 
   // Early return after all hooks
   if (!hasData) {
@@ -130,7 +141,7 @@ export const Histogram = ({
           <Bar
             dataKey="count"
             fill="var(--primary)"
-            animationDuration={animationDuration}
+            animationDuration={effectiveAnimationDuration}
             animationEasing="ease-in-out"
           />
         </BarChart>

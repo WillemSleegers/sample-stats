@@ -12,17 +12,18 @@ export const draw = async (
   n: number,
   params: Parameters
 ): Promise<number[]> => {
-  switch (params.type) {
-    case "normal": {
-      const result = (await webR.evalR(
-        `rnorm(${n}, mean = ${params.mean}, sd = ${params.sd})`
-      )) as RObject & { toArray: () => Promise<unknown[]> }
-      try {
-        return (await result.toArray()) as number[]
-      } finally {
-        await webR.destroy(result)
+  try {
+    switch (params.type) {
+      case "normal": {
+        const result = (await webR.evalR(
+          `rnorm(${n}, mean = ${params.mean}, sd = ${params.sd})`
+        )) as RObject & { toArray: () => Promise<unknown[]> }
+        try {
+          return (await result.toArray()) as number[]
+        } finally {
+          await webR.destroy(result)
+        }
       }
-    }
 
     case "lognormal": {
       const result = (await webR.evalR(
@@ -75,17 +76,25 @@ export const draw = async (
       }
     }
 
-    case "metalog": {
-      // Metalog doesn't have a native R implementation, use custom one
-      return rmetalog(
-        n,
-        [
-          { p: 0.1, x: params.p10 },
-          { p: 0.5, x: params.p50 },
-          { p: 0.9, x: params.p90 },
-        ],
-        { lower: params.lower, upper: params.upper }
-      )
+      case "metalog": {
+        // Metalog doesn't have a native R implementation, use custom one
+        return rmetalog(
+          n,
+          [
+            { p: 0.1, x: params.p10 },
+            { p: 0.5, x: params.p50 },
+            { p: 0.9, x: params.p90 },
+          ],
+          { lower: params.lower, upper: params.upper }
+        )
+      }
     }
+  } catch (error) {
+    console.error("Error drawing samples:", error)
+    throw new Error(
+      `Failed to generate samples from ${params.type} distribution: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    )
   }
 }

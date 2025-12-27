@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useMemo, useCallback } from "react"
 import { Histogram } from "@/components/graphs/histogram"
 import { StatisticsSummary } from "@/components/statistics"
 import { FullScreen, FullScreenHandle } from "react-full-screen"
@@ -44,19 +44,21 @@ export const SamplingVisualization = ({
   const lastUpdateTimeRef = useRef<number>(0)
   const lastStatsUpdateRef = useRef<number>(0)
 
-  // Clear displayed count when clearTrigger changes
+  // Clear displayed count when clearTrigger changes (use key instead of setState in effect)
+  const displayCountKey = useMemo(() => clearTrigger, [clearTrigger])
+
   useEffect(() => {
     setDisplayedCount(0)
     setStats({})
-  }, [clearTrigger])
+  }, [displayCountKey])
 
-  const updateStats = () => {
+  const updateStats = useCallback(() => {
     if (displayedCount === 0) return
 
     const currentSamples = allSamples.slice(0, displayedCount)
     const newStats = calculateAllStats(currentSamples)
     setStats(newStats)
-  }
+  }, [displayedCount, allSamples])
 
   // Progressively display samples using requestAnimationFrame
   useEffect(() => {
@@ -108,12 +110,21 @@ export const SamplingVisualization = ({
         animationFrameRef.current = null
       }
     }
-  }, [isSampling, allSamples.length, speed, showStats, displayedCount, setIsSampling])
+  }, [isSampling, allSamples.length, speed, showStats, displayedCount, setIsSampling, updateStats])
 
-  const displayedSamples = allSamples.slice(0, displayedCount)
+  const displayedSamples = useMemo(
+    () => allSamples.slice(0, displayedCount),
+    [allSamples, displayedCount]
+  )
 
   return (
     <>
+      {/* Screen reader announcements for sampling progress */}
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {isSampling && `Sampling in progress: ${displayedCount} of ${MAX_SAMPLES} samples`}
+        {displayedCount >= MAX_SAMPLES && `Sampling complete: ${MAX_SAMPLES} samples collected`}
+      </div>
+
       <FullScreen
         handle={fullScreenHandle}
         className="h-100 max-w-150 mx-auto outline-none fullscreen:h-screen fullscreen:max-w-none fullscreen:flex fullscreen:items-center fullscreen:justify-center fullscreen:bg-background"
