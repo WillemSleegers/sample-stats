@@ -1,11 +1,11 @@
 export const SPEED_SETTINGS = {
-  slow: { interval: 1000, n: 1, animationDuration: 1000 },
+  slow: { interval: 2000, n: 1, animationDuration: 1000 },
   normal: { interval: 250, n: 1, animationDuration: 500 },
   fast: { interval: 100, n: 1, animationDuration: 100 },
   fastest: { interval: 50, n: 1, animationDuration: 0 },
 }
 
-export const MAX_SAMPLES = 10000 // Maximum number of samples to keep in memory
+export const MAX_SAMPLES = 100 // Maximum number of samples to keep in memory
 
 export const DEFAULT_PARAMETERS = {
   normal: { type: "normal" as const, mean: 0, sd: 1 },

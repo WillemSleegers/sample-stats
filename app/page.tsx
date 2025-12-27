@@ -9,7 +9,6 @@ import { FullscreenIcon, RotateCcwIcon } from "lucide-react"
 import { Hero } from "@/components/hero"
 import { Button } from "@/components/ui/button"
 import { AppSidebar } from "@/components/app-sidebar"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { SettingsSidebarTrigger } from "@/components/sidebar-trigger"
 import { DistributionPicker } from "@/components/distribution-picker"
@@ -124,20 +123,17 @@ const App = () => {
         <div className="w-full px-4 pt-4 md:px-6 md:pt-6">
           <div className="flex justify-between items-center mb-8">
             <SettingsSidebarTrigger />
-            <div className="flex gap-2">
-              {supportsFullscreen && (
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onPointerDown={handleFullscreen}
-                  disabled={!isSampling}
-                  aria-label="Enter fullscreen mode"
-                >
-                  <FullscreenIcon className="text-muted-foreground" />
-                </Button>
-              )}
-              <ThemeToggle />
-            </div>
+            {supportsFullscreen && (
+              <Button
+                size="icon"
+                variant="ghost"
+                onPointerDown={handleFullscreen}
+                disabled={!isSampling}
+                aria-label="Enter fullscreen mode"
+              >
+                <FullscreenIcon className="text-muted-foreground" />
+              </Button>
+            )}
           </div>
           <div className="space-y-12">
             <Hero />

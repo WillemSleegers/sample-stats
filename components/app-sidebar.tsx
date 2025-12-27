@@ -3,6 +3,7 @@ import { Distribution, Parameters, SpeedSetting } from "@/lib/types"
 import FormDistribution from "./forms/form-distribution"
 import { Dispatch, SetStateAction } from "react"
 import { SelectSpeed } from "./select-speed"
+import { SelectTheme } from "./select-theme"
 import { Switch } from "./ui/switch"
 import { Label } from "./ui/label"
 import { Input } from "./ui/input"
@@ -126,6 +127,15 @@ export const AppSidebar = ({
             <FieldTitle>Sampling</FieldTitle>
             <FieldDescription>Control sampling speed</FieldDescription>
             <SelectSpeed speed={speed} setSpeed={setSpeed} />
+          </FieldGroup>
+
+          <FieldSeparator className="my-0" />
+
+          {/* Appearance Settings Section */}
+          <FieldGroup className="gap-3">
+            <FieldTitle>Appearance</FieldTitle>
+            <FieldDescription>Customize the look</FieldDescription>
+            <SelectTheme />
           </FieldGroup>
         </div>
       </SidebarContent>
